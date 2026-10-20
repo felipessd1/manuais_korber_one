@@ -1,0 +1,1300 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MRFP — Navegador de Campos | K.Motion Enterprise 3PL</title>
+<style>
+  :root{
+    --blueberry:#1C2543;
+    --blueberry-2:#223262;
+    --classic:#0F4C81;
+    --raspberry:#92223E;
+    --ink:#22303C;
+    --muted:#5C6B7A;
+    --line:#C9D2E2;
+    --alt:#F4F6FA;
+    --code-bg:#F2F5FA;
+    --warn-bg:#FBF0F3;
+    --sans:'Segoe UI',Carlito,'DejaVu Sans',Arial,sans-serif;
+    --mono:ui-monospace,Consolas,'Cascadia Mono','DejaVu Sans Mono',monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#fff;color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+
+  /* ---------- brand bar ---------- */
+  .brandbar{background:linear-gradient(40deg,#1C2543 0%,#1C2543 40%,#223262 90%);color:#fff;padding:22px 26px 18px;border-bottom:3px solid var(--classic)}
+  .brandbar .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#9FB0CE;margin:0 0 6px}
+  .brandbar h1{margin:0;font-size:27px;font-weight:600;letter-spacing:-.01em}
+  .brandbar h1 span{font-family:var(--mono);font-weight:700;color:#fff;background:rgba(255,255,255,.12);padding:1px 9px;border-radius:4px;font-size:24px;margin-right:8px}
+  .brandbar p{margin:8px 0 0;font-size:13.5px;color:#C6D2E6;max-width:78ch}
+  .brandbar .src{margin-top:10px;font-size:11.5px;color:#8FA2C2;font-family:var(--mono)}
+
+  .brandbar .topline{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+  .brandbar h1 i{font-style:normal}
+  .lang{display:flex;flex:none;border:1px solid rgba(255,255,255,.35);border-radius:4px;overflow:hidden}
+  .lang button{border:0;background:transparent;color:#C6D2E6;font:inherit;font-size:12px;font-weight:700;letter-spacing:.06em;padding:4px 12px;cursor:pointer}
+  .lang button+button{border-left:1px solid rgba(255,255,255,.28)}
+  .lang button:hover{color:#fff;background:rgba(255,255,255,.10)}
+  .lang button[aria-pressed="true"]{background:#fff;color:var(--blueberry)}
+
+  /* ---------- impact map (signature) ---------- */
+  .impact{padding:16px 26px 14px;border-bottom:1px solid var(--line);background:#fff}
+  .impact h2{margin:0 0 3px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--classic);font-weight:700}
+  .impact .hint{margin:0 0 11px;font-size:12.5px;color:var(--muted)}
+  .progs{display:flex;flex-wrap:wrap;gap:6px}
+  .prog{display:inline-flex;align-items:baseline;gap:6px;border:1px solid var(--line);background:#fff;border-radius:3px;padding:5px 9px;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--blueberry);font-weight:600;transition:background .12s,border-color .12s,color .12s}
+  .prog b{font-family:var(--sans);font-weight:600;font-size:11px;color:var(--muted)}
+  .prog:hover{border-color:var(--classic)}
+  .prog[aria-pressed="true"]{background:var(--blueberry);border-color:var(--blueberry);color:#fff}
+  .prog[aria-pressed="true"] b{color:#A9BBDA}
+
+  /* ---------- toolbar ---------- */
+  .toolbar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:11px 26px;background:rgba(255,255,255,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  .search{flex:1 1 320px;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:4px;padding:7px 11px;background:#fff}
+  .search:focus-within{border-color:var(--classic);box-shadow:0 0 0 3px rgba(15,76,129,.11)}
+  .search input{border:0;outline:0;flex:1;font:inherit;font-size:14px;color:var(--ink);background:transparent}
+  .search svg{flex:none;color:var(--muted)}
+  .count{font-size:12.5px;color:var(--muted);font-family:var(--mono);white-space:nowrap}
+  .tgl{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none}
+  .tgl input{accent-color:var(--classic);width:15px;height:15px}
+  .clear{border:1px solid var(--line);background:#fff;border-radius:3px;padding:6px 10px;font:inherit;font-size:12.5px;color:var(--raspberry);cursor:pointer}
+  .clear:hover{background:var(--warn-bg);border-color:var(--raspberry)}
+
+  /* ---------- layout ---------- */
+  .wrap{display:grid;grid-template-columns:246px minmax(0,1fr);align-items:start}
+  nav.rail{position:sticky;top:56px;max-height:calc(100vh - 56px);overflow-y:auto;border-right:1px solid var(--line);padding:16px 0 40px;background:var(--alt)}
+  .grp{padding:14px 18px 5px;font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .grp:first-child{padding-top:2px}
+  .tab{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:transparent;padding:7px 18px 7px 16px;font:inherit;font-size:13.5px;color:var(--ink);cursor:pointer;border-left:3px solid transparent}
+  .tab:hover{background:#E8EDF6}
+  .tab .n{font-family:var(--mono);font-size:11px;color:var(--muted);flex:none}
+  .tab[aria-current="true"]{background:#fff;border-left-color:var(--raspberry);font-weight:600;color:var(--blueberry)}
+  .tab[aria-current="true"] .n{color:var(--classic)}
+
+  main{padding:24px 30px 90px;min-width:0}
+  .tabhead{border-bottom:2px solid var(--classic);padding-bottom:10px;margin-bottom:6px}
+  .tabhead h2{margin:0;font-size:22px;color:var(--blueberry);font-weight:600}
+  .tabhead h2 code{font-family:var(--mono);font-size:15px;background:var(--code-bg);border:1px solid var(--line);border-radius:3px;padding:1px 7px;color:var(--classic);margin-left:9px;vertical-align:middle}
+  .tabhead p{margin:9px 0 0;font-size:14px;color:var(--muted);max-width:88ch}
+
+  /* ---------- field card ---------- */
+  .card{border:1px solid var(--line);border-radius:5px;margin-top:16px;overflow:hidden;background:#fff}
+  .card>header{padding:12px 16px 11px;border-bottom:1px solid var(--line);background:var(--alt)}
+  .fname{margin:0;font-size:15.5px;font-weight:600;color:var(--blueberry);font-family:var(--mono);letter-spacing:-.01em}
+  .fpt{margin:5px 0 0;font-size:14px;color:var(--ink)}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+  .chip{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:3px;background:#fff;border:1px solid var(--classic);color:var(--classic)}
+  .chip.res{border-color:var(--raspberry);color:var(--raspberry);background:var(--warn-bg);font-family:var(--sans);letter-spacing:.02em}
+  .chip.cust{border-color:#8A6D1F;color:#8A6D1F;background:#FCF8EC;font-family:var(--sans)}
+  table{width:100%;border-collapse:collapse}
+  td{padding:9px 16px;font-size:13.7px;vertical-align:top;border-top:1px solid #E4E9F2}
+  tr:first-child td{border-top:0}
+  tr:nth-child(even) td{background:var(--alt)}
+  td.v{width:30%;min-width:150px;font-family:var(--mono);font-size:12.4px;color:var(--blueberry);font-weight:600}
+  td.v em{font-style:normal;color:var(--raspberry);font-family:var(--sans);font-size:11px;display:block;font-weight:600;margin-top:2px}
+  .note{padding:11px 16px;font-size:13.2px;color:var(--ink);background:var(--code-bg);border-top:1px solid var(--line);border-left:3px solid var(--classic)}
+  .note.warn{background:var(--warn-bg);border-left-color:var(--raspberry)}
+  .note b{color:var(--blueberry)}
+  .note.warn b{color:var(--raspberry)}
+  .note code,.fpt code,td code{font-family:var(--mono);font-size:12.3px;background:#fff;border:1px solid var(--line);border-radius:3px;padding:0 4px}
+
+  .empty{margin-top:40px;padding:26px;border:1px dashed var(--line);border-radius:5px;text-align:center;color:var(--muted);font-size:14px}
+  .srctag{display:inline-block;margin-top:26px;font-family:var(--mono);font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;width:100%}
+  mark{background:#FFF0A8;color:inherit;padding:0 1px;border-radius:2px}
+
+  @media (max-width:880px){
+    .wrap{grid-template-columns:1fr}
+    nav.rail{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;padding:8px}
+    .grp{width:100%;padding:8px 10px 2px}
+    .tab{width:auto;border-left:0;border-bottom:3px solid transparent;padding:6px 10px}
+    .tab[aria-current="true"]{border-left:0;border-bottom-color:var(--raspberry)}
+    main{padding:18px 16px 70px}
+    .brandbar,.impact,.toolbar{padding-left:16px;padding-right:16px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<div class="brandbar">
+  <div class="topline">
+    <p class="eyebrow">WMS Regional · Emergent Cold LatAm</p>
+    <div class="lang" role="group" aria-label="Idioma / Idioma">
+      <button data-l="pt" aria-pressed="true">PT</button><button data-l="es" aria-pressed="false">ES</button>
+    </div>
+  </div>
+  <h1><span>MRFP</span><i id="tTitle"></i></h1>
+  <p id="tIntro"></p>
+  <p class="src" id="tSrc"></p>
+</div>
+
+<section class="impact">
+  <h2 id="tMapH"></h2>
+  <p class="hint" id="tMapP"></p>
+  <div class="progs" id="progs"></div>
+</section>
+
+<div class="toolbar">
+  <label class="search">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="q" type="search" autocomplete="off">
+  </label>
+  <label class="tgl"><input type="checkbox" id="hideRes"> <span id="tHide"></span></label>
+  <span class="count" id="count"></span>
+  <button class="clear" id="clr" hidden></button>
+</div>
+
+<div class="wrap">
+  <nav class="rail" id="rail" aria-label="Abas do MRFP"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+const TABS=[
+ {id:"rfch-q",g:"Recebimento — RFCH",label:"RFCH Queries",code:"RFCH Queries",sum:"Controla o que aparece na pick list do RFCH quando o operador faz uma consulta. Nenhum campo aqui altera regra de negócio — só a informação exibida na tela do coletor."},
+ {id:"rfch1",g:"Recebimento — RFCH",label:"RFCH Only",code:"RFCH Only",sum:"O núcleo do comportamento do RFCH: criação de linhas, duplicidade de inventário, contagem por tie/hi/loose, tratamento de variância e regras de quantity breakdown."},
+ {id:"rfch2",g:"Recebimento — RFCH",label:"RFCH Only (2)",code:"RFCH Only (2)",sum:"Validações complementares no recebimento: peso/cubagem do item, concatenação de níveis, modos especiais de recebimento, porta, e put-away de múltiplos paletes."},
+ {id:"rfch3",g:"Recebimento — RFCH",label:"RFCH Only (3)",code:"RFCH Only (3)",sum:"Regras de exceção e produtividade: divergência de quantidade, palete misto, scan repetitivo (grocery style), ordenação das linhas e limites de palete."},
+ {id:"rfch4",g:"Recebimento — RFCH",label:"RFCH Only (4)",code:"RFCH Only (4)",sum:"Aba curta: comportamento da localização de staging sugerida e permissão para zerar linhas de recebimento."},
+ {id:"rfchs",g:"Recebimento — RFCH",label:"RFCH Shared",code:"RFCH Shared",sum:"Campos que valem simultaneamente para RFCH e RFPU. É aqui que se define o casamento de quantidade com o ENRE, o limite máximo por linha e a data de confirmação."},
+ {id:"rfpu",g:"Recebimento — RFPU",label:"RFPU",code:"RFPU",sum:"Comportamento do put-away: validação de pick line, staging (put-away em três etapas), variância, confirmação de localização sugerida e movimentação de múltiplos paletes."},
+ {id:"pic1",g:"Expedição — RFPIC / RFPK",label:"RFPIC",code:"RFPIC",sum:"Modo de picking default, regras de palete duplicado, picking parcial, holds suspensos, ressuprimento dentro do RFPIC e exibição do bloco de paletes."},
+ {id:"pic2",g:"Expedição — RFPIC / RFPK",label:"RFPIC (2)",code:"RFPIC (2)",sum:"Contagem de inventário (count back) no picking, geração e impressão do OPID, e ordenação da pick list por SOSE."},
+ {id:"pic3",g:"Expedição — RFPIC / RFPK",label:"RFPIC (3)",code:"RFPIC (3)",sum:"Atalhos de digitação, segregação de perigosos, validação por UPC, bookmark na pick list e overrides de supervisor no RFPK."},
+ {id:"pic4",g:"Expedição — RFPIC / RFPK",label:"RFPIC (4)",code:"RFPIC (4)",sum:"Relocação de produto bloqueado, SKU de exibição x SKU de picking, múltiplos OPIDs, staging default, máscara de UI e investigação de contagem (ICIN)."},
+ {id:"pic5",g:"Expedição — RFPIC / RFPK",label:"RFPIC (5)",code:"RFPIC (5)",sum:"Regras finas de count back, os dois campos que governam o RFITLV e o controle de override do OPID atribuído pelo sistema."},
+ {id:"misc1",g:"Diversos",label:"Miscellaneous",code:"Miscellaneous",sum:"Relocação (RFRL) e movimentação de pedido (RFST): pick list, validação de pick line, directed move e exibição da quantidade de origem."},
+ {id:"misc2",g:"Diversos",label:"Miscellaneous (2)",code:"Miscellaneous (2)",sum:"Unicidade de número de série, merge de OPIDs (RFMG), execução da relocação, confirmação de OPID (RFCO) e auditoria de saída (RFOA)."},
+ {id:"misc3",g:"Diversos",label:"Miscellaneous (3)",code:"Miscellaneous (3)",sum:"Count back fora do RFPIC: em quais programas ocorre, quando dispara, o que fazer na divergência e a base da contagem (item x entidade)."},
+ {id:"misc4",g:"Diversos",label:"Miscellaneous (4)",code:"Miscellaneous (4)",sum:"Movimentação de múltiplos paletes em RFRP/RFRL/RFST, put-away misto, código de motivo para override de localização e captura de peso em RFOPS/RFSC."},
+ {id:"misc5",g:"Diversos",label:"Miscellaneous (5)",code:"Miscellaneous (5)",sum:"Ressuprimento (REPI): put-back, capacidade da pick line e modo demanda. Também validação de entrada manual em RFOPS e quantity breakdown."}
+];
+
+const F=[
+/* ============== RFCH QUERIES ============== */
+{t:"rfch-q",n:"Customize Query Results in RFCH",pt:"Liga ou desliga a personalização da pick list do RFCH em modo consulta.",p:["RFCH"],
+ o:[["Yes","Os campos abaixo passam a valer: só o que estiver marcado como Yes aparece na pick list"],["No","A personalização é ignorada e todos os valores aparecem — código do cliente, número e linha do recebimento, todos os níveis de inventário, etc."]],
+ d:"É o interruptor mestre da aba. Com <b>No</b>, os nove campos seguintes não têm efeito algum."},
+{t:"rfch-q",n:"Receipt Number",pt:"Exibe o número do recebimento na pick list de consulta.",p:["RFCH"],o:[["Yes","Aparece na pick list"],["No","Não aparece"]]},
+{t:"rfch-q",n:"Receipt Line Number",pt:"Exibe o número da linha do recebimento na pick list.",p:["RFCH"],o:[["Yes","Aparece na pick list"],["No","Não aparece"]]},
+{t:"rfch-q",n:"Inventory Level 1",pt:"Exibe o nível 1 de inventário (normalmente o item) na pick list.",p:["RFCH"],o:[["Yes","Aparece na pick list"],["No","Não aparece"]]},
+{t:"rfch-q",n:"Inventory Level 2",pt:"Exibe o nível 2 de inventário (lote, data code) na pick list.",p:["RFCH"],o:[["Yes","Aparece na pick list"],["No","Não aparece"]]},
+{t:"rfch-q",n:"Inventory Level 3",pt:"Exibe o nível 3 de inventário na pick list.",p:["RFCH"],o:[["Yes","Aparece na pick list"],["No","Não aparece"]]},
+{t:"rfch-q",n:"Inventory Level 4",pt:"Exibe o nível 4 de inventário na pick list.",p:["RFCH"],o:[["Yes","Aparece na pick list"],["No","Não aparece"]]},
+{t:"rfch-q",n:"Warehouse Code",pt:"Exibe o código do armazém na pick list.",p:["RFCH"],o:[["Yes","Aparece na pick list"],["No","Não aparece"]]},
+{t:"rfch-q",n:"Quantity",pt:"Exibe a quantidade na pick list.",p:["RFCH"],o:[["Yes","Aparece na pick list"],["No","Não aparece"]]},
+{t:"rfch-q",n:"Hold Code",pt:"Exibe o código de bloqueio (hold) na pick list.",p:["RFCH"],o:[["Yes","Aparece na pick list"],["No","Não aparece"]]},
+
+/* ============== RFCH ONLY ============== */
+{t:"rfch1",n:"Label Document Printed",pt:"Documento de etiqueta impresso quando o operador cria uma nova linha de recebimento no RFCH.",p:["RFCH"],
+ o:[["<código DOCU>","O operador é solicitado a imprimir o documento ao criar uma nova linha"],["(em branco)","Nenhuma impressão é solicitada"]],
+ d:"O documento informado precisa ter tipo <code>LA</code> (Label) no DOCU. Campo opcional."},
+{t:"rfch1",n:"Show Temperature and Pallet Blocks",pt:"Define quais blocos de informação o operador pode preencher em cada recebimento.",p:["RFCH"],
+ o:[["Not required","Nenhum bloco é exibido"],["Enter temperature, trailer/seal number and pallet block","Exibe os três blocos"],["Enter pallet block only","Só o bloco de paletes"],["Enter trailer/seal number only","Só carreta/lacre"],["Enter temperature only","Só temperatura"],["Enter trailer/seal number and pallet block","Carreta/lacre e paletes"],["Enter temperature and trailer/seal number","Temperatura e carreta/lacre"],["Enter temperature and pallet block","Temperatura e paletes"]],
+ d:"<b>Nenhuma dessas opções é obrigatória para o operador.</b> Ativar a captura de temperatura permite que ele digite a temperatura no RFCH, mas não o obriga a fazê-lo. Se a captura precisa ser mandatória, o controle tem de vir de outro lugar."},
+{t:"rfch1",n:"Perform Trailer Checks",pt:"Sequência de checagens da carreta antes do descarregamento.",p:["RFCH"],
+ o:[["Yes","O operador é conduzido por uma série de checagens de carreta"],["No","Nenhuma checagem é solicitada"]],
+ d:"Só fica disponível se a entrada de número de carreta estiver ativada em <code>Show Temperature and Pallet Blocks</code>."},
+{t:"rfch1",n:"Allow New Lines",pt:"Se e como o operador pode criar novas linhas de recebimento direto no coletor.",p:["RFCH"],
+ o:[["Yes (1)","Pode criar linhas com o comando CL (Create Lines); ao terminar a última linha é perguntado se marca o recebimento como completo ou cria nova linha"],["No (2)","Não pode criar linhas e não recebe a pergunta ao final"],["Stay in New Line Mode (3)","Não recebe a pergunta e o fluxo do cabeçalho do recebimento NÃO é avançado"],["Allow New Line from Existing Entity on Receipt… (4)","Só pode acrescentar linha se for uma entidade de inventário já existente no recebimento"],["Allow New Line With Supervisor Approval (5)","Só com login de supervisor autorizando a transação"]],
+ d:"Exemplo da opção 4: o operador recebeu 20 caixas do palete 123 e depois achou mais uma caixa do mesmo palete — essa caixa pode ser adicionada; uma caixa do palete 456, que não está no recebimento, não pode."},
+{t:"rfch1",n:"Allow Duplicate Inventory",pt:"Checagem de inventário duplicado no RFCH quando a linha é do tipo U (Unknown) no ENRE.",p:["RFCH"],
+ o:[["No Validation (1)","Nenhuma mensagem ao receber inventário duplicado"],["Disallow Duplicate Inventory Entities (2)","Pop-up ao receber entidade duplicada; o operador aceita ou rejeita o scan"],["Disallow Duplicate Inventory UI’s (3)","Pop-up ao receber UI duplicada; o operador aceita ou rejeita"],["Disallow Duplicate Inventory Entities, No User Override (4)","Bloqueia — entidade duplicada não pode ser recebida"],["Disallow Duplicate Inventory UI’s, No User Override (5)","Bloqueia — UI duplicada não pode ser recebida"]],
+ d:"Vale <b>apenas para linhas tipo U</b> criadas no ENRE."},
+{t:"rfch1",n:"Default Staging Warehouse/Location Code",pt:"Armazém e localização de staging pré-preenchidos no put-away em duas etapas com staging manual.",p:["RFCH"],
+ o:[["<armazém + localização>","Os campos Loc e Whse aparecem preenchidos; o operador aceita ou digita outros"],["(em branco)","O operador informa staging manualmente"]]},
+{t:"rfch1",n:"Must Use Tie/Hi/Loose to Calculate Receiving Quantity",pt:"Obriga a contagem por camada/altura/avulso em vez da quantidade total.",p:["RFCH","RFCV"],
+ o:[["No","Campos Tie, Hi e Loose desabilitados; o operador só digita a quantidade total"],["Yes","Operador é obrigado a informar tie/hi/loose por linha e o campo Qty fica desabilitado"],["Yes With Variance Check in P-Type Lines","Idem Yes; se a quantidade calculada não bate com a esperada no ENRE, o operador tem uma segunda tentativa — persistindo a divergência, ela precisa ser tratada por supervisor no RFCV"]],
+ d:"Exemplo do manual: tie/hi/loose <code>5/10/03</code> = 53 caixas; <code>5/10/-1</code> = 49 caixas. A opção Yes existe para forçar contagens mais precisas e reduzir erro de recebimento."},
+{t:"rfch1",n:"Variance Rules",pt:"Quem pode ver e tratar a tela de variância quando a quantidade digitada não bate com a esperada.",p:["RFCH"],
+ o:[["Variance screen for all users","Qualquer usuário processa a variância"],["Variance screen for supvr. only","Não-supervisores não conseguem pressionar F3 para zerar a linha"],["Only allow if supvr. approved","Ao pressionar F3, o não-supervisor exige login e aprovação de supervisor"]],
+ d:"<b>A variância é sempre registrada no LORE</b>, qualquer que seja a opção — inclusive quando a tela de variância não é exibida."},
+{t:"rfch1",n:"Tolerance Check for PO",pt:"Checagem de tolerância contra o pedido de compra.",p:["RFCH"],res:1,o:[["—","Reservado para uso futuro"]]},
+{t:"rfch1",n:"Enter Quantity Breakdown for U-Type Line",pt:"Permite alterar no coletor o quantity breakdown de uma linha tipo U.",p:["RFCH"],
+ o:[["No","O breakdown não pode ser alterado no RFCH"],["Yes","O operador pode sobrepor o breakdown digitado no ENRE"],["Set Quantity Breakdown to Line Quantity for IQBP With 2 SKU Classes","O breakdown do item é automaticamente igualado à quantidade da linha digitada no RFCH"]],
+ d:"Para Yes e para a terceira opção, <b>três condições precisam ser atendidas</b>: o item está configurado como variable quantity breakdown no ITEM; foi recebido em linha tipo U no ENRE; e a entidade de inventário é nova (nunca recebida antes no armazém)."},
+{t:"rfch1",n:"Expiry Date Rules",pt:"Suprime a tela de data de validade em linhas tipo U.",p:["RFCH"],
+ o:[["Disable expiry date entry for U-type line","A tela de validade NÃO é exibida, mesmo que a entrada manual esteja ativa no ITSH do item"],["(em branco)","A tela é exibida se a entrada manual de validade estiver ativa no ITSH"]]},
+{t:"rfch1",n:"Enter/Change Hold Code",pt:"Nível de acesso do operador ao campo de hold no RFCH.",p:["RFCH"],
+ o:[["Allow Entry/Change of Hold Code","(default) Pode criar novos holds e alterar existentes"],["Disallow Change of Hold Code. Allow New Hold Code.","Pode criar novos holds, mas não alterar os existentes"],["Disallow Entry/Change of Hold Code","Tem acesso ao campo Hold, mas não pode alterar o código"],["Skip Hold Code","Não tem acesso ao campo Hold — e por consequência não consegue alterar a quantidade"]],
+ d:"<b>As duas opções restritivas não funcionam</b> quando existe um item hold profile configurado no IHOP e anexado ao item no ITEM."},
+
+/* ============== RFCH ONLY (2) ============== */
+{t:"rfch2",n:"Validate Item Weight/Cube Setup",pt:"Checa se o SKU base do item recebido tem peso e cubagem maiores que zero.",p:["RFCH","ITEM"],
+ o:[["Not Required","Nenhuma checagem é feita"],["Check Weight and Cube","Se o item reprovar, o operador é obrigado a informar os valores faltantes no RFCH antes de receber a linha"]],
+ d:"Quando o operador preenche os valores, <b>o RFCH atualiza o Quantity Breakdown Block do ITEM</b> — ou seja, o coletor grava no cadastro do item."},
+{t:"rfch2",n:"Extra Charge Entry Type",pt:"Momento em que a tela de cobranças extras aparece no recebimento.",p:["RFCH"],
+ o:[["Allow Extra Charge Entry When Completed","A tela aparece ao terminar de conferir/descarregar a linha"],["Allow Extra Charge Entry When Exiting","A tela aparece ao sair do RFCH"]],
+ d:"A entrada de cobranças extras em RF só existe para cobranças <b>por cliente</b> (perfil ECHP anexado a um cliente). Cobranças extras anexadas a item não são suportadas em RF."},
+{t:"rfch2",n:"Concatenate Inventory Level in U-Type Line",pt:"Anexa o valor escaneado ao nível 2 já digitado no ENRE, em vez de substituí-lo.",p:["RFCH"],
+ o:[["Concatenate Level 2 to Beginning of Current Value","O valor lido é colado no início do nível 2"],["Concatenate Level 2 to End of Current Value","O valor lido é colado no fim do nível 2"],["(em branco)","Sem concatenação"]],
+ d:"Só vale para linhas tipo U em que o operador seleciona o número do recebimento a partir de uma pick list. Uso típico: o escritório cria a linha com o nível 2 normal e o operador escaneia um date code (ex.: <code>101101</code>) que é anexado a esse valor."},
+{t:"rfch2",n:"Keep First Location Entry and Skip the Field",pt:"Repete a primeira localização informada nas linhas seguintes.",p:["RFCH"],
+ o:[["Yes","Depois da primeira entrada o operador pula o campo Location e endereça as demais linhas na mesma localização"],["No","A localização é pedida a cada linha"]]},
+{t:"rfch2",n:"Allow Change to Receiving Mode",pt:"Permite trocar entre put-away de uma e de duas etapas dentro do RFCH.",p:["RFCH"],
+ o:[["Yes","O operador alterna entre one-step e two-step put-away"],["No","O modo é fixo"]]},
+{t:"rfch2",n:"Special Receiving Mode Types",pt:"Ativa um modo especial de recebimento exigido pela operação.",p:["RFCH","RFPU"],
+ o:[["U Line Receiving, Enter UI, Scan Serial as Inventory Level","Recebimento por linha U com leitura de série como nível de inventário"],["RFCH to Gen Stag Loc, RFPU to PnD Loc, Then to Final Loc *","Put-away em três etapas — <b>exige setup especial</b>"],["RFCH to Gen Stag Loc, RFPU to PnD Loc, Then to Final Loc","Put-away em três etapas"],["RFCH Overrides *","<b>Exige setup especial</b>"],["(em branco)","Modos especiais desativados"]],
+ d:"As opções marcadas com <b>*</b> requerem configuração dedicada — ver a seção de put-away em três etapas no capítulo de descarregamento em RFCH."},
+{t:"rfch2",n:"Validate Inventory Level from Bar Code Using SCPR Code",pt:"Perfil de scan usado para validar níveis de inventário no recebimento.",p:["RFCH","SCPR","ITEM"],
+ o:[["<código SCPR>","Valida os níveis lidos contra o perfil; nível inválido impede o operador de prosseguir"],["(em branco)","Sem validação por SCPR"]],
+ d:"Este é o <b>SCPR default no nível do cliente</b>. Ele pode ser sobreposto por item no campo <code>Scan Parameter Code for Inventory Validation (SCPR)</code> do ITEM."},
+{t:"rfch2",n:"Door Rules",pt:"Se o operador pode selecionar ou alterar a porta (doca) no recebimento.",p:["RFCH"],
+ o:[["Door Not Used","Não pode selecionar nem alterar a porta"],["Enter/Update Door in RFCH","Pode informar e alterar a porta"]]},
+{t:"rfch2",n:"Display Quantity Breakdown",pt:"Mostra ou suprime o quantity breakdown do item na tela do RFCH.",p:["RFCH"],
+ o:[["Yes","O breakdown do item é exibido"],["No","O breakdown é suprimido"]]},
+{t:"rfch2",n:"Allow Put-Away of Multiple Pallets in RFCH",pt:"Endereça vários paletes em uma única etapa: o operador lê duas ou mais UIs e informa a localização destino uma só vez.",p:["RFCH","MHET","COMP"],
+ o:[["Yes","Put-away múltiplo liberado, respeitadas as restrições"],["No","Um palete por vez"]],
+ d:"<b>Cinco restrições simultâneas:</b> todo o produto tem o mesmo nível 1; equipment tracking ativado no COMP; flag <code>Location Required</code> ativa no MHET; os paletes não têm hold codes misturados; e o número de paletes não excede a capacidade máxima do tipo de equipamento."},
+{t:"rfch2",n:"Enter Quantity Breakdown for P-Type Line",pt:"Permite alterar no coletor o quantity breakdown de uma linha tipo P.",p:["RFCH"],
+ o:[["No","O breakdown do item não pode ser alterado no RFCH"],["Yes","O operador pode sobrepor o breakdown digitado no ENRE"],["Set Quantity Breakdown to Line Quantity for IQBP With 2 SKU Classes","O breakdown é automaticamente igualado à quantidade da linha digitada no RFCH"]],
+ d:"Mesmas três condições da versão U-Type, mudando apenas o tipo de linha: item variable quantity breakdown no ITEM, recebido em <b>linha tipo P</b> no ENRE, e entidade de inventário nova."},
+{t:"rfch2",n:"Update Expiry Date for P-Type Line",pt:"Permite sobrepor a data de validade em linhas tipo P.",p:["RFCH","ITSH"],
+ o:[["Yes","O operador pode sobrepor a validade"],["No","A validade não pode ser alterada"]],
+ d:"O item shipping profile (ITSH) anexado ao item precisa ter <code>Enter Expiry Dates = Yes</code>."},
+
+/* ============== RFCH ONLY (3) ============== */
+{t:"rfch3",n:"Capture Photo When Unloading First UI",pt:"Captura de imagem no descarregamento da primeira UI.",p:["RFCH"],cust:1,
+ o:[["Yes","Captura ativada"],["No","Captura desativada"]],
+ d:"<b>Disponível apenas em coletores Intermec CK71.</b>"},
+{t:"rfch3",n:"Capture Photo When UI is Put On Hold",pt:"Captura de imagem quando uma UI é colocada em hold.",p:["RFCH"],cust:1,
+ o:[["Yes","Captura ativada"],["No","Captura desativada"]],
+ d:"<b>Disponível apenas em coletores Intermec CK71.</b>"},
+{t:"rfch3",n:"Duplicate Receiving Rules if Qty. Entered < Qty. Received",pt:"O que fazer quando a quantidade digitada no RFCH é menor que a do ENRE.",p:["RFCH"],
+ o:[["Create Second Line With Remainder (1)","Cria uma segunda linha com a diferença"],["Prompt User to Zero Out Second Line (2)","Pergunta ao operador se zera a segunda linha — Sim leva ao resultado da opção 3, Não ao da opção 1"],["Zero Out Second Line Automatically (3)","Cria automaticamente a segunda linha com quantidade 0"]],
+ d:"Exemplo do manual: ENRE = 100 CS, RFCH = 99 CS. Com a opção 1 nasce uma segunda linha de 1 CS."},
+{t:"rfch3",n:"Allow Mixed Pallet for Items With Same ILOP",pt:"Recebimento de palete misto quando os itens compartilham o mesmo código ILOP.",p:["RFCH","ILOP"],
+ o:[["Yes","Palete misto pode ser recebido para itens de mesmo ILOP"],["No","Palete misto não pode ser recebido"]]},
+{t:"rfch3",n:"Use Repetitive Scan With ALIT Starting With Inventory",pt:"Ativa o scan estilo mercearia (grocery style) no recebimento.",p:["RFCH","ALIT"],
+ o:[["Level 1","Scan repetitivo a partir do nível 1"],["Level 2","A partir do nível 2"],["Level 3","A partir do nível 3"],["Level 4","A partir do nível 4"]],
+ d:"Usado para produto sem quebra padrão palete/caixa — vestuário, por exemplo — em que cada peça precisa ser lida individualmente. Uma leitura pode valer 1 unidade ou qualquer outra quantidade definida; o sistema calcula a contagem pelo número de peças lidas e pelo setup do <b>ALIT</b>."},
+{t:"rfch3",n:"Sort Sequence Code (SOSE)",pt:"Ordem em que as linhas do recebimento aparecem no RFCH.",p:["RFCH","SOSE"],
+ o:[["<código SOSE>","As linhas são ordenadas conforme o código de sort sequence ao digitar o número do recebimento"],["(em branco)","As linhas seguem a ordem do número de linha do recebimento"]]},
+{t:"rfch3",n:"Receiving Qty. Must be Less Than or Equal to Item Pallet Qty.",pt:"Impede o recebimento de paletes fora do padrão (acima da quebra do item).",p:["RFCH"],
+ o:[["Yes","Quantidade acima da quebra padrão é rejeitada"],["No","Sem restrição"]],
+ d:"Exemplos com quebra de 50 caixas/palete: ENRE 1 PLT + RFCH 1 PLT → normal · ENRE 1 PLT + RFCH 2 PLT → normal · ENRE 1 PLT + RFCH 50 CS → normal · <b>ENRE 1 PLT + RFCH 51 CS → rejeitado</b> · ENRE 1 PLT 30 CS + RFCH 1 PLT 31 CS → normal · <b>ENRE 51 CS + RFCH 51 CS → rejeitado</b>."},
+{t:"rfch3",n:"Allow Skipping of Level Validation",pt:"Permite seguir com o recebimento mesmo se a validação de nível por SCPR falhar.",p:["RFCH","SCPR"],
+ o:[["Yes","O operador continua recebendo a linha mesmo com falha na validação"],["No","A falha bloqueia"]],
+ d:"Só se aplica se o campo <code>Validate Inventory Level from Bar Code Using SCPR Code</code> (aba RFCH Only 2) estiver ativo."},
+{t:"rfch3",n:"Special Item Process Capture Mode",pt:"Momento em que os process values são capturados no recebimento.",p:["RFCH","IPRO"],
+ o:[["Capture Item Processes Before Entering Location","O operador escaneia os process values ANTES de informar a localização de staging"],["(em branco)","Os process values são escaneados DEPOIS da localização de staging"]]},
+{t:"rfch3",n:"Keep Last Location for One-Step Manual Put-Away",pt:"Repete a última localização usada no put-away manual de uma etapa.",p:["RFCH"],
+ o:[["Yes","A última localização é exibida no RFCH"],["No","O campo Location sempre vem em branco"]]},
+
+/* ============== RFCH ONLY (4) ============== */
+{t:"rfch4",n:"Always Prompt to Enter a Staging Location",pt:"Se a localização de staging sugerida é exibida ou tem de ser escaneada.",p:["RFCH"],
+ o:[["No","A sugestão no campo L: é suprimida e o operador é obrigado a escanear o staging"],["Yes","O campo L: vem preenchido com o staging sugerido e basta Enter para aceitar"]],
+ d:"Atenção à leitura invertida: <b>No é o modo mais rígido</b> (obriga o scan), Yes é o mais rápido."},
+{t:"rfch4",n:"Zero Out Receipt Lines",pt:"Quem pode zerar linhas de recebimento no RFCH.",p:["RFCH"],
+ o:[["Not Allowed","Ninguém pode zerar"],["All Users Are Allowed","Qualquer usuário pode zerar"],["Supervisors Only Are Allowed","Apenas supervisores"]]},
+
+/* ============== RFCH SHARED ============== */
+{t:"rfchs",n:"Show Default Quantity in RFCH/RFPU",pt:"Exibe a quantidade recebida do ENRE como default no coletor.",p:["RFCH","RFPU"],
+ o:[["Yes","A quantidade do ENRE aparece como default nos dois programas; Enter confirma ou digita-se outra"],["No","A quantidade do ENRE não é exibida"],["RFPU Only","A quantidade só aparece no RFPU"],["Variance Screen Only","A quantidade só aparece na tela de variância"]],
+ d:"Campo de impacto direto na acurácia: exibir a quantidade esperada facilita o trabalho, mas também facilita a confirmação cega."},
+{t:"rfchs",n:"RFCH/RFPU Quantity Must Match ENRE Quantity",pt:"Regra de casamento entre a quantidade digitada no coletor e a esperada no ENRE.",p:["RFCH","RFPU","ENRE"],
+ o:[["Must match ENRE (1)","Tem de bater; se não bater, a linha não pode ser processada"],["Matching not required (2)","Não precisa bater; aviso só quando a recebida é MAIOR que a esperada"],["Warn if mismatch with ENRE (3)","Gera aviso na divergência, mas o operador prossegue"],["No warning if mismatch with ENRE (4)","Nenhum aviso na divergência"],["Receive no more than original lines expected quantity in RFPU (5)","No RFCH não precisa bater; no RFPU não pode exceder a quantidade esperada"],["Must match ENRE in RFCH. No more than original line expected quantity in RFPU (6)","No RFCH tem de bater; no RFPU não pode exceder"]],
+ d:"Disponível <b>apenas para linhas tipo P</b>."},
+{t:"rfchs",n:"Supvr. Must Authorize Location Overrides in RFCH/RFPU/RFRL",pt:"Exige aprovação de supervisor para sobrepor a localização atribuída pelo sistema.",p:["RFCH","RFPU","RFRL"],
+ o:[["Yes","Override de localização exige aprovação de supervisor"],["No / (em branco)","O operador sobrepõe sem aprovação"]],
+ d:"<b>Exceção importante:</b> a aprovação do supervisor NÃO é exigida para sobrepor uma localização de put-away por uma localização de staging."},
+{t:"rfchs",n:"Validate One Process Value",pt:"Leitura de uma etiqueta por palete para validar número de série e níveis do código de barras.",p:["RFCH","RFPIC"],
+ o:[["RFCH Only","Validação apenas no recebimento"],["RFPIC Only","Validação apenas no picking"],["RFCH and RFPIC","Validação nos dois"],["RFCH Only in Supervr. Override Mode","Validação no RFCH; se a etiqueta faltar ou for inválida, abre o login de supervisor"],["None","Sem validação"]],
+ d:"A validação só ocorre em <b>linhas tipo P</b>, quando a quantidade total foi recebida e todos os process values foram informados. Etiqueta ausente ou inválida impede concluir o recebimento (RFCH) ou o pedido (RFPIC). No modo supervisor, o supervisor escolhe por quanto tempo desligar a validação: só aquele palete, todos os paletes do recebimento, ou todos os paletes daquele item no recebimento."},
+{t:"rfchs",n:"Advance Receipt Header When Last Line Confirmed",pt:"Confirma automaticamente o cabeçalho do recebimento ao confirmar a última linha.",p:["RFCH","RFPU"],
+ o:[["Yes","(default) O cabeçalho é confirmado junto com a última linha"],["No","O cabeçalho não é confirmado automaticamente"]],
+ d:"A opção <b>No existe para permitir acrescentar novas linhas depois</b> que todas as linhas do recebimento já foram confirmadas."},
+{t:"rfchs",n:"Maximum Quantity Allowed in RFCH/RFPU",pt:"Teto de quantidade para qualquer linha de recebimento no coletor.",p:["RFCH","RFPU"],
+ o:[["<número>","Teto definido por você"],["(em branco)","Teto default de 9999"]]},
+{t:"rfchs",n:"Put Away Partial Pallet to Reserved Area",pt:"Regras de put-away de palete parcial em área reservada.",p:["RFCH","RFPU"],
+ o:[["No","Desativado — valem as regras normais de put-away em área não reservada"],["Yes","Ativado, com a lógica de classificação descrita abaixo"],["Yes, With Allowing Over a Pallet as a Full Pallet","Mesma lógica do Yes, mas quantidade acima da quebra padrão NÃO gera mensagem e o put-away segue normal"]],
+ d:"<b>Lógica do Yes:</b> quantidade recebida zero ou nula → interrompe e envia «SEE SUPERVISOR» · igual à quebra padrão → palete cheio · menor que a quebra padrão → palete parcial · maior que a quebra padrão → interrompe e envia «SEE SUPERVISOR»."},
+{t:"rfchs",n:"Receipt Confirmation Date in RFCH/RFPU",pt:"Qual data é gravada como data de confirmação do recebimento.",p:["RFCH","RFPU","CHRF"],
+ o:[["Receipt Date","A data de criação do recebimento"],["Actual Company Date","A data de confirmação do recebimento no CHRF"]],
+ d:"Campo com efeito direto em faturamento e em relatórios de produtividade por data. Vale conferir antes de fechar mês."},
+
+/* ============== RFPU ============== */
+{t:"rfpu",n:"Validation Rules for Put-Away to Pick Line",pt:"O que acontece quando o operador tenta endereçar produto numa pick line não configurada para ele.",p:["RFPU","PIIT"],
+ o:[["Stop operator from proceeding","O operador não consegue endereçar em pick line que não está configurada para o produto no PIIT"],["Allow operator to proceed","Reservado para uso futuro"],["Omit validation of location","O operador endereça em qualquer pick line sem restrição"]]},
+{t:"rfpu",n:"Allow Put-Away to Staging Location",pt:"Habilita o put-away em três etapas (endereçar primeiro num staging).",p:["RFPU"],
+ o:[["Yes","O operador pode endereçar para uma localização de staging"],["No","Não é possível endereçar para staging no RFPU"]],
+ d:"Com Yes, enquanto o produto estiver em staging o fluxo do recebimento <b>permanece em STPU (Start Put-Away)</b> e só avança para PUCO (Put-Away Complete) quando uma localização não-staging for finalmente informada."},
+{t:"rfpu",n:"Variance Handling",pt:"Exibição e aprovação da tela de variância no put-away.",p:["RFPU"],
+ o:[["Variance screen deactivated","A tela não aparece para ninguém"],["Variance screen no sup. override","Aparece para todos e não exige supervisor"],["Variance screen with sup. override","Aparece para todos e exige supervisor"],["Variance screen for sup. only","Aparece só para supervisores, sem override adicional"]],
+ d:"Como no RFCH, <b>a variância é sempre registrada no LORE</b> mesmo quando a tela não é exibida."},
+{t:"rfpu",n:"Validation Rules for System-Assigned Locations",pt:"Se o operador precisa reescanear a localização atribuída pelo sistema.",p:["RFPU","LOTP"],
+ o:[["No validation for system-assigned locations and overrides allowed","Basta Enter para aceitar a localização sugerida"],["Validation required WHEN system assigns location and overrides allowed","O operador tem de redigitar/escanear a localização para confirmar"],["Validation required ONLY for system-assigned locations and overrides allowed","A confirmação só é exigida quando a localização tem tipo LOTP com <code>Directed Put-Away = Yes</code>"]]},
+{t:"rfpu",n:"Event-Driven Cycle Count Profile (CYCP)",pt:"Perfil de contagem cíclica disparada por evento no put-away.",p:["RFPU","CYCP"],
+ o:[["<código CYCP>","Dispara contagem cíclica por evento conforme o perfil"],["(em branco)","Sem contagem por evento"]],
+ d:"Detalhamento no <b>Cycle Counting Guide</b> (manual B)."},
+{t:"rfpu",n:"Allow Quantity to be Updated",pt:"Se o operador pode alterar a quantidade da linha no put-away.",p:["RFPU"],
+ o:[["Yes","Pode informar ou modificar a quantidade"],["No","O cursor pula o campo Qty e a quantidade não pode ser alterada"]]},
+{t:"rfpu",n:"Enter/Change Hold Code",pt:"Nível de acesso do operador ao campo de hold no RFPU.",p:["RFPU"],
+ o:[["Allow Entry/Change of Hold Code","Pode criar novos holds e alterar existentes"],["Disallow Change of Hold Code. Allow New Hold Code","Pode criar novos, não pode alterar existentes"],["Disallow Entry/Change of Hold Code","Sem nenhum acesso ao campo de hold no RFPU"]]},
+{t:"rfpu",n:"Maximum Number of F3 (NX) Allowed Per ILOP Sequence",pt:"Quantas vezes o operador pode pedir a próxima localização sugerida.",p:["RFPU","ILOP"],
+ o:[["<número>","Limite de vezes que F3 (NX) pode ser pressionado para exibir outra sugestão de put-away"]],
+ d:"Controle antifraude clássico: sem limite, o operador pode pular sugestões até chegar na localização que ele prefere."},
+{t:"rfpu",n:"Allow Put-Away of Multiple Pallets in RFPU",pt:"Endereça vários paletes lendo várias UIs e informando o destino uma única vez.",p:["RFPU","MHET","COMP"],
+ o:[["Yes *","Put-away múltiplo liberado"],["No","Um palete por vez"]],
+ d:"Mesmas cinco restrições do RFCH (mesmo nível 1, equipment tracking no COMP, <code>Location Required</code> no MHET, sem holds misturados, dentro da capacidade do equipamento). <b>* Não suporta directed put-away</b> — apenas os fluxos INST e STPU podem ter <code>Assign Location = Yes</code>."},
+{t:"rfpu",n:"Allow Receiving of Multiple Lines Together",pt:"Endereça várias linhas de recebimento numa única etapa.",p:["RFPU","ILOP"],
+ o:[["Allow Receiving of Multiple Lines Together","Liberado, atendidas as quatro condições"],["Disallow Receiving Multiple Lines Together","Uma linha por vez"]],
+ d:"<b>Quatro condições:</b> todas as linhas têm a mesma UI; estão na mesma localização com o mesmo hold code (se houver); todos os itens têm três ou quatro níveis de inventário; e a quantidade digitada é a total, no menor SKU. Se o Directed Move Inbound atribuiu localizações e o palete tem itens misturados, o <b>ILOP do item de maior quantidade no palete</b> é quem define a localização destino."},
+{t:"rfpu",n:"Change of Warehouse Rules",pt:"Se o operador pode trocar o código do armazém e se isso exige confirmação.",p:["RFPU"],
+ o:[["Confirmation Required","O operador confirma a troca de armazém"],["Allow Change of Warehouse Code, No Confirmation Required","Troca sem confirmação"],["Do Not Allow Change of Warehouse Code","Não pode trocar de armazém"]]},
+{t:"rfpu",n:"Confirm Receipt Line for Opportunistic Cross-Dock in RFPU",pt:"Confirmação automática da linha endereçada para localização de cross-dock.",p:["RFPU","CHRF"],
+ o:[["Yes","A linha é confirmada automaticamente ao concluir o put-away"],["No","A linha precisa ser confirmada manualmente no CHRF"]]}
+];
+</script>
+<script>
+F.push(
+/* ============== RFPIC ============== */
+{t:"pic1",n:"Default Mode",pt:"Modo de picking default e o que o operador pode ou não escolher no coletor.",p:["RFPIC","RFPK"],
+ o:[["Only Case Picking","O operador não consegue selecionar pallet nem normal mode (NM)"],["Only Pallet Picking","O operador não consegue selecionar case pick (CP) — exceto quando pica de pick line"],["Pallet Picking","O operador confirma pallet ou normal mode (NM) como default"],["Case Picking","O operador confirma case pick como default"]],
+ d:"Uma vez escolhido o modo no RFPIC, ele <b>vale para todos os pedidos</b> até o operador sair do programa ou trocar com F2. <b>Picking a partir de pick line força automaticamente Case Picking</b>, qualquer que seja a configuração. Este campo pode ser sobreposto por combinação cliente/transportadora/consignatário no <b>CCCC</b>."},
+{t:"pic1",n:"Allow Loading Before Completion of Picking Process",pt:"Permite iniciar o carregamento antes de terminar o picking do pedido.",p:["RFPIC","OLOP"],
+ o:[["Yes","O operador pode começar a carregar no OLOP antes de picar tudo"],["No","Todo o produto do pedido tem de ser picado antes do carregamento"]]},
+{t:"pic1",n:"Duplicate Pallet Label Rules",pt:"Como o sistema trata IDs de palete duplicados no picking.",p:["RFPIC","RFPK"],
+ o:[["Allow Duplicate Pallet ID’s (1)","Duplicados permitidos sem restrição"],["Disallow Duplicate Pallet ID’s (2)","Duplicados nunca permitidos"],["Operator Decision in all Orders (3)","O operador aceita ou rejeita o duplicado, em todos os pedidos"],["Disallow Duplicate Pallet ID’s in Open Orders (4)","Duplicados proibidos em pedidos abertos"],["Operator Decision in Open Orders (5)","O operador decide, apenas em pedidos abertos"],["Allow Duplicate Pallet ID’s in Its Own Order Only (6)","Duplicados só dentro do próprio pedido"]]},
+{t:"pic1",n:"Allow Partial Picking in Normal Mode",pt:"Quais linhas de pedido aparecem na pick list do RFPIC em normal mode.",p:["RFPIC"],
+ o:[["Allow all, no restriction (1)","Todas as linhas aparecem, independentemente da quantidade"],["Allow last remaining partial inventory and full pallets (2)","Só paletes cheios e parciais que representem o último saldo da localização"],["Allow full pallets only (3)","Só paletes cheios — para linhas parciais o operador tem de trocar para case pick"],["Allow PALL pick method only (4)","Só paletes cheios gerados pelo Wave Manager"]],
+ d:"Definição usada pelo sistema: <b>quantidade parcial = 60% ou mais do total da localização</b>. Exemplo: com 50 caixas na localização e necessidade de picar 30, é possível escanear as 20 que ficam em vez das 30 que saem — o objetivo é reduzir leituras. Este campo também pode ser sobreposto no <b>CCCC</b>."},
+{t:"pic1",n:"Assign PID on Full Pallets or Last Inventory",pt:"Quando o pallet ID é gravado no Process Block do pedido sob o código CP.",p:["RFPIC","RFITLV"],
+ o:[["In NM Mode (1)","Gravado ao picar palete cheio ou a última entidade da localização em normal mode"],["No (2)","Nunca gravado"],["In CP Mode as the first pick (3)","Gravado após o primeiro pick em case pick mode"],["RFPIC CP Mode Full Pallet (INVT QTY Break) or RFITLV PALL Pick Method (4)","Gravado ao picar paletes cheios pela quebra padrão do item, em case pick mode no RFPIC"]],
+ d:"A opção 4 é a única que menciona explicitamente o <b>RFITLV</b> — relevante em ambiente de tasking."},
+{t:"pic1",n:"Number of Days for Label Validation",pt:"Valida a data embutida no código de barras da caixa contra a data do pedido.",p:["RFPIC"],cust:1,
+ o:[["> 0","Se o valor for menor que (data de chegada do pedido − data do código de barras), aparece «Too old for order» e a caixa não pode ser picada"],["0 ou em branco","Libera o comportamento de escanear as caixas que SAEM do palete cheio em vez das que são picadas, em quantidade parcial"]],
+ d:"<b>A opção maior que zero exige etiqueta customizada.</b> Repare que o valor zero não é só «desligado» — ele habilita outro comportamento de leitura."},
+{t:"pic1",n:"Allow Suspended Holds",pt:"O que acontece com o saldo não picado de uma linha: split, hold suspenso e realocação.",p:["RFPIC","MIRP"],
+ o:[["Split Order Line, No Suspended Hold","A linha é dividida, nenhum hold suspenso é aplicado e a nova linha pode ser picada a qualquer momento. O comando F3 (HD) fica indisponível"],["Allow Suspended Holds","Operadores não-supervisores podem colocar produto em hold suspenso"],["Only Allow if Supervisor Approved","Hold suspenso só com aprovação de supervisor (comando HD) — e o pick parcial também exige aprovação"],["Split Order Line, Allow Suspended Hold","Não-supervisores podem colocar em hold suspenso"],["Split Order Line, Supervisor Approved","Hold suspenso só com aprovação — mas o pick parcial NÃO exige aprovação"]],
+ d:"Nas duas primeiras opções de hold suspenso a linha é dividida em duas: linha 1 com a quantidade picada, linha 2 com o saldo — <b>a linha 2 vai para hold suspenso e o sistema tenta realocá-la</b>. Nas duas opções «Split Order Line…», a linha 2 NÃO recebe hold suspenso e NÃO há tentativa de realocação. Este campo <b>pode ser sobreposto por item no MIRP</b>."},
+{t:"pic1",n:"Disallow Process Value Scanning",pt:"Se os process values podem ser lidos dentro do RFPIC ou apenas no RFOPS.",p:["RFPIC","RFOPS"],
+ o:[["Yes","O operador NÃO pode escanear process values no RFPIC — tem de fazê-lo no RFOPS"],["No","Pode escanear em qualquer um dos dois programas"]],
+ d:"Na versão <b>6.2</b> este campo aparece desdobrado (ex.: «Disallow Process Value Scanning RFCH/RFPU»), variante não presente na documentação 4.2. Delta de versão a validar no ambiente."},
+{t:"pic1",n:"Allow Picking Outside Pick Line",pt:"Permite picar produto de pick line a partir de localização de bulk ou rack.",p:["RFPIC","REPI"],
+ o:[["Yes","Picking fora da pick line ativado"],["No","Não permitido"]],
+ d:"Existe para evitar congestionamento na pick line quando vários ressuprimentos são gerados para o mesmo produto. Exemplo do manual: pedido de 10 caixas, 5 na pick line, ressuprimento de 60 caixas — o operador pica as 10 do bulk e <b>as 10 são subtraídas do ressuprimento</b> (60 − 10 = 50). Disponível quando a quantidade total não está na pick line e já existe ressuprimento gerado."},
+{t:"pic1",n:"Replenishment Rules for Pick Line",pt:"Onde o ressuprimento da pick line é executado.",p:["RFPIC","RFRP","REPI"],
+ o:[["REPI done inside of RFPIC","O operador executa ressuprimentos dentro do próprio RFPIC"],["REPI done separately","(default) Ressuprimento só em RFRP ou RFPL"],["Determined by the user","A cada login o operador escolhe o modo de ressuprimento"]]},
+{t:"pic1",n:"Display Original Order Number/Quantity for Consolidated Picks",pt:"Mostra o pedido e a quantidade originais quando o pick é consolidado.",p:["RFPIC","COPI"],
+ o:[["No Display","Não exibe"],["Display at UI Field","Exibe pedido, quantidade e SKU originais num pop-up depois que o operador informa a UI"]],
+ d:"Só se aplica a picking consolidado, após consolidar os pedidos no <b>COPI</b>."},
+{t:"pic1",n:"Display Pallet Screen",pt:"Quando o Pallet Block aparece no RFPIC.",p:["RFPIC","RFSC"],
+ o:[["Do not display","O bloco não aparece e o operador não pode expedir, receber ou trocar paletes no programa"],["Display before Picking","Aparece antes do picking"],["Display on completion of Picking","Aparece depois do picking"],["Display after RFSC","Aparece depois da cartonização manual no RFSC"]]},
+
+/* ============== RFPIC (2) ============== */
+{t:"pic2",n:"Activate Inventory Count",pt:"Com que frequência o operador é obrigado a contar a localização durante o picking (count back).",p:["RFPIC"],
+ o:[["Always","Contagem obrigatória em cada localização de pick"],["Never","Contagem desativada no RFPIC"],["If Quantity Reaches or Falls Below Threshold Quantity","Contagem só quando o saldo atinge ou fica abaixo do limite definido"],["Every 2nd / 3rd / 4th … 9th Line","Contagem a cada N picks"]]},
+{t:"pic2",n:"Inventory Count Rules",pt:"O que fazer quando a contagem informada não bate com o saldo do sistema.",p:["RFPIC","ICIN"],
+ o:[["Ignore investigations","Nenhum registro no ICIN e o operador pica normalmente"],["Supervisor must override","O pick fica travado até um supervisor aceitar ou rejeitar a divergência — <b>aceita: nenhum ICIN; rejeita: cria ICIN</b>"],["Flow advancement not allowed","Reservado para uso futuro"],["Super. override/No flow adv.","Reservado para uso futuro"]],
+ d:"Só disponível se <code>Activate Inventory Count</code> estiver diferente de Never."},
+{t:"pic2",n:"Threshold Quantity to Initiate Count",pt:"Saldo a partir do qual a contagem é disparada.",p:["RFPIC"],
+ o:[["<quantidade>","Limite para iniciar a contagem"]],
+ d:"Só disponível se <code>Activate Inventory Count</code> = «If Quantity Reaches or Falls Below Threshold Quantity»."},
+{t:"pic2",n:"Automatically Assign Pallet ID",pt:"Geração automática do pallet ID em case pick mode.",p:["RFPIC","DOCU"],
+ o:[["Yes","O sistema gera um pallet ID único e o cursor avança sozinho para o campo Printer; o operador NÃO pode alterá-lo"],["No","O operador escolhe: Enter para o sistema gerar, ou digitar/escanear um ID externo"],["Use SSCC-18 Pallet Sequence Number","O ID gerado é um número de sequência SSCC-18 válido"]],
+ d:"<b>A opção Yes exige documento de etiqueta</b> em <code>Label Document</code> ou em <code>Quick Response Label Document</code>. Se todos os consignatários usam quick response, o Label Document não é necessário; se há mistura, os dois campos precisam ser preenchidos."},
+{t:"pic2",n:"Label Document",pt:"Documento de etiqueta usado no case pick.",p:["RFPIC","DOCU"],
+ o:[["<código DOCU>","O campo Label no RFPIC vem preenchido com esse documento"]],
+ d:"Só disponível se <code>Automatically Assign Pallet ID = Yes</code>. Se houver registro de detalhe no DOCU informando impressora e operador, <b>o campo Printer no RFPIC também vem preenchido</b> com a impressora do operador."},
+{t:"pic2",n:"Quick Response Label Document",pt:"Documento de etiqueta quick response usado no case pick.",p:["RFPIC","DOCU"],
+ o:[["<código DOCU>","O campo Label no RFPIC vem preenchido com o número quick response"]],
+ d:"Só disponível se <code>Automatically Assign Pallet ID = Yes</code>. Mesma regra de preenchimento automático da impressora via registro de detalhe no DOCU."},
+{t:"pic2",n:"Sort Sequence Code (SOSE)",pt:"Ordenação (snaking) da pick list de tarefas do RFPIC.",p:["RFPIC","SOSE"],
+ o:[["<código SOSE>","A pick list é ordenada pelo SQL do sort sequence"],["(em branco)","A pick list segue a ordem de código de localização"]],
+ d:"Comportamento crítico: com sort sequence ativo, <b>o operador escolhe livremente o primeiro item/localização/entidade da lista, mas depois disso é obrigado a terminar aquele agrupamento antes de passar ao próximo</b>. Exemplo: com sort por item e três itens no pedido, ao escolher o item B ele tem de picar todas as linhas do item B primeiro. O SQL precisa conter o nome da tabela — <code>c_invt</code>, <code>e_ord_d5d1</code> ou <code>m_loc</code>."},
+{t:"pic2",n:"Sort Sequence Based on",pt:"Sobre qual valor a ordenação do SOSE é aplicada.",p:["RFPIC","SOSE"],
+ o:[["Item","Ordena e agrupa por item"],["Location","Por localização"],["Inventory Entity","Por entidade de inventário"]]},
+{t:"pic2",n:"Event-Driven Cycle Count Profile (CYCP)",pt:"Perfil de contagem cíclica disparada por evento durante o picking.",p:["RFPIC","CYCP"],
+ o:[["<código CYCP>","Dispara contagem cíclica por evento"],["(em branco)","Sem contagem por evento"]],
+ d:"Detalhamento no <b>Cycle Counting Guide</b> (manual B)."},
+{t:"pic2",n:"Enter Outbound Pallet ID Before Picking",pt:"Se os parâmetros da etiqueta são informados antes ou depois do pick.",p:["RFPIC","RFITLV"],
+ o:[["No","O operador informa os parâmetros de etiqueta DEPOIS de picar as linhas"],["Yes","Informa ANTES de picar"]],
+ d:"Disponível <b>apenas para case pick mode em RFPIC/RFITLV</b>."},
+{t:"pic2",n:"Generation of Outbound Pallet ID Label",pt:"Como o OPID é gerado, impresso e validado.",p:["RFPIC","RFPK"],
+ o:[["Not Required (1)","Nenhuma etiqueta é impressa e o campo PRT é pulado"],["OPID Generated by System - Validation Required (2)","Enter no campo L(abel) gera o OPID; o operador escaneia para validar"],["OPID Generated by System - No Validation (3)","Enter gera o OPID, sem scan de validação"],["OPID Generated by Users - No Validation (4)","O operador digita ou escaneia um OPID externo"],["OPID Generated by Users - Validation Required (5)","O operador digita ou escaneia o OPID externo DUAS vezes"],["OPID generated by System - Hide Partial OPID, Print & Validate before Staging (6)","O operador informa OPID externo; depois de imprimir, escaneia a etiqueta para conferir se bate com o original"],["After printing, OPID generated by the User (7)","Opção customizada"]]},
+{t:"pic2",n:"Extra Charge Entry Type",pt:"Momento em que a tela de cobranças extras aparece no picking.",p:["RFPIC"],
+ o:[["Allow Extra Charge Entry When Completed","A tela aparece ao terminar de picar a linha do pedido"],["Allow Extra Charge Entry When Exiting","A tela aparece ao sair do RFPIC"]],
+ d:"Como no inbound, só vale para cobranças extras <b>por cliente</b> configuradas no ECHP."},
+
+/* ============== RFPIC (3) ============== */
+{t:"pic3",n:"Display Rules for Location/UI/Quantity",pt:"Elimina digitações e validações para acelerar o picking.",p:["RFPIC"],
+ o:[["Display Location/UI When Picking from Pick Line","Exibe localização/UI ao picar de pick line"],["Display Location/UI for All Locations","Exibe para todas as localizações"],["Display and Bypass Location/Qty in NM Mode","Exibe e pula localização/quantidade em normal mode"],["Display and Bypass UI (non-reserve)","Exibe e pula a UI em localização não-reserva"],["Display and Bypass UI When Picking from Pick Line","Exibe e pula a UI ao picar de pick line"],["Skip Location-From and Go to UI; Show Line Qty and Skip Qty field in NM Mode","Pula a localização de origem, vai direto à UI e mostra a quantidade da linha pulando o campo Qty"]],
+ d:"Cada «bypass» ganha velocidade e <b>perde um ponto de controle</b>. Vale mapear o que cada opção deixa de validar antes de escolher."},
+{t:"pic3",n:"Separate Hazmat by Item in Each Pick",pt:"Aplica as regras de segregação de produto perigoso no picking e no merge.",p:["RFPIC","RFMG","IHZV"],
+ o:[["Yes","As regras de segregação do IHZV valem em RFPIC e RFMG"],["No","As regras do IHZV são ignoradas nesses dois programas"]],
+ d:"É este flag que <b>liga</b> o IHZV. Com as regras violadas, o operador não consegue picar a linha nem fazer o merge do OPID."},
+{t:"pic3",n:"Warehouse/Location for Kit Lines",pt:"Armazém e localização para linhas de kit.",p:["RFPIC"],res:1,o:[["—","Reservado para uso futuro"]]},
+{t:"pic3",n:"Rules for Picking by Item/UPC",pt:"Validação do código UPC lido pelo operador contra o cadastro de itens alternativos.",p:["RFPIC","ALIT"],
+ o:[["Validate Item/UPC for All Locations (1)","Valida em todas as localizações"],["Validate Item/UPC in Pick Line Locations (2)","Valida apenas em localizações de pick line"],["No (3)","Sem validação dos níveis 2/3/4 do ALIT"]],
+ d:"O UPC lido é confrontado com o UPC cadastrado no ALIT: se os níveis de inventário ligados ao UPC batem com os da linha do pedido, o pick é aceito; se não batem, é rejeitado. Na opção 3, para <b>contas de um único nível</b>, o operador pode ler tanto o código do item (nível 1) quanto o UPC."},
+{t:"pic3",n:"Capture OPID Cube and Dimension",pt:"Captura de dimensões cúbicas e peso bruto por caixa/palete.",p:["RFPIC","RFSC"],cust:1,
+ o:[["In RF Pick","Captura no RFPIC — dimensões em metros e peso bruto em quilos"],["In RF Sorting","Captura no RFSC"],["(em branco)","Captura desativada nos dois programas"]],
+ d:"<b>Apenas para uso customizado.</b>"},
+{t:"pic3",n:"Disable Last Label Scan in RFPK",pt:"Desabilita a leitura da última etiqueta no wave pick.",p:["RFPK"],res:1,o:[["—","Reservado para uso futuro"]]},
+{t:"pic3",n:"Use Bookmark in Picklist",pt:"Marca a posição na pick list para o operador continuar de onde parou.",p:["RFPIC"],
+ o:[["Yes","A primeira linha escolhida é marcada; ao voltar à lista, ela abre na linha SEGUINTE ao marcador"],["No","A lista sempre reabre na primeira linha"]],
+ d:"<b>A opção Yes não fica disponível se o campo <code>Sort Sequence Code (SOSE)</code> estiver preenchido</b> — bookmark e sort sequence são mutuamente exclusivos."},
+{t:"pic3",n:"Allow Case Pick While in CART Mode in RFPK",pt:"Ativa o pick method 7 (Less Than Full Pallet) no wave pick.",p:["RFPK"],
+ o:[["Yes","Pick method 7 ativado no RFPK"],["No","Não disponível"]]},
+{t:"pic3",n:"Allow Reusable Cartons in RFPK",pt:"Caixas reutilizáveis no wave pick.",p:["RFPK"],res:1,o:[["—","Reservado para uso futuro"]]},
+{t:"pic3",n:"Supervisor Override Required for BATP in RFPK",pt:"Quando o wave pick em batch label mode exige override de supervisor.",p:["RFPK","BATP"],
+ o:[["Override Required for Reduce Order Qty Only","Só quando o operador reduz a quantidade do pedido"],["Override Required for Short of Inventory Only","Só quando o operador declara falta (short)"],["Override Required for Both Reduce Order Qty and Short of Inventory","Nos dois casos"],["Override Not Required for Exceptions","Nenhum override — o operador reduz e declara falta livremente"]],
+ d:"Diferença entre os dois casos (exemplos do manual): <b>reduzir quantidade</b> = pedido de 10 unidades, há 10 na localização e o operador pica 5. <b>Short</b> = pedido de 10, há 10 na localização mas 5 estão avariadas, o operador pica 5 e declara falta das outras 5."},
+{t:"pic3",n:"Automatically Confirm Order After Last Pick",pt:"Confirmação automática do pedido ao picar a última linha.",p:["RFPIC","CHOF"],
+ o:[["Yes","O pedido é confirmado automaticamente"],["No","O pedido precisa ser confirmado manualmente no CHOF"]],
+ d:"<b>A opção Yes não admite nenhum fluxo entre FIPI (Finish Picking) e COOR (Confirm Order).</b> Se a operação tem etapas intermediárias — auditoria, packing, staging com fluxo próprio — este campo tem de ficar em No."},
+{t:"pic3",n:"Enter Pallet Type",pt:"Exige que o operador informe um tipo de palete válido no picking.",p:["RFPIC","PALL","CONS"],
+ o:[["Yes","O operador tem de informar um tipo de palete definido no PALL"],["No","Não é solicitado"]],
+ d:"Se houver um código de palete definido para o consignatário no campo <code>Pallet Code</code> do CONS, <b>o RFPIC valida se o palete informado bate com o do consignatário</b>."},
+
+/* ============== RFPIC (4) ============== */
+{t:"pic4",n:"Allow Relocation if Allocated Product Blocked",pt:"Abre o RFRL quando o operador lê uma UI que está na localização certa mas não é a alocada.",p:["RFPIC","RFRL"],
+ o:[["Yes","O RFRL é exibido sempre que o operador informa uma «UI inválida»"],["No","Aparece mensagem de erro e o RFRL não fica disponível"]],
+ d:"Existe para resolver o caso do produto que está <b>fisicamente na frente</b> e bloqueando o produto alocado ao pedido — o operador tira o obstáculo sem sair do fluxo."},
+{t:"pic4",n:"Display and Pick SKU",pt:"Qual SKU é exibido e qual SKU o operador informa ao picar.",p:["RFPIC","ENOR"],
+ o:[["Display and Pick in Lowest SKU","Exibe e pica sempre no menor SKU, mesmo que difira do SKU do ENOR"],["Display in Order Line SKU, Pick in Lowest","Exibe o SKU da linha do ENOR, mas o operador informa no menor SKU"]]},
+{t:"pic4",n:"Allow Pick of Multiple OPID’s in RFPIC",pt:"Leva vários OPIDs ao staging numa única etapa.",p:["RFPIC","MHET","COMP"],
+ o:[["Yes","Múltiplos OPIDs por movimento, respeitadas as restrições"],["Yes Plus Unconsolidated COPI Orders Only With Full Pallet Pick in NM Mode","Idem, incluindo pedidos COPI não consolidados apenas com palete cheio em normal mode"],["No","Um OPID por pick"]],
+ d:"Mesmas cinco restrições dos movimentos múltiplos: mesmo nível 1, equipment tracking no COMP, <code>Location Required</code> no MHET, sem holds misturados e dentro da capacidade do equipamento."},
+{t:"pic4",n:"Display Rules for Default Staging Location",pt:"Como o staging default é exibido e se precisa ser escaneado.",p:["RFPIC","SELO"],
+ o:[["Last Staging Location in Previous Pick, Scan not Required","Repete o staging do pick anterior, sem scan"],["Display Last Staging Location from Order, Scan Required","Mostra o último staging do pedido e exige scan"],["Display Last Order Staging Location and Load Staging Location, Scan Required","Mostra staging do pedido e da carga, com scan"],["Display Last Staging Location from Order, Scan not Required","Mostra o último staging do pedido, sem scan"],["Do Not Display Staging Location in Normal Mode","Não exibe staging em normal mode"]]},
+{t:"pic4",n:"Picking Methods for PnD Location",pt:"Modos de picking permitidos em localizações P&D.",p:["RFPIC","WHZO"],
+ o:[["Full Pallet Only","Só palete cheio"],["All Pick Modes","Todos os modos"]]},
+{t:"pic4",n:"Display Order of Items and Descriptions in Pick List",pt:"Ordem em que item e descrição aparecem na pick list.",p:["RFPIC"],
+ o:[["Item, Description","Código do item primeiro"],["Description, Item","Descrição primeiro"]]},
+{t:"pic4",n:"Display Pick Quantity in Higher UOM",pt:"Exibe a quantidade a picar na maior unidade de medida.",p:["RFPIC"],
+ o:[["Yes","A quantidade aparece no maior SKU (normalmente PLT)"],["No","Mantém a unidade padrão"]]},
+{t:"pic4",n:"Validate OPID Using MSVS Code",pt:"Validação customizada de OPID via special verifier SQL.",p:["RFPIC","MSVS"],cust:1,
+ o:[["<código MSVS>","Executa a validação customizada definida no MSVS"],["(em branco)","Sem validação customizada"]],
+ d:"Este é um dos pontos de entrada de <b>customização por MSVS</b> no fluxo de picking — só deve ser usado depois de esgotadas as opções nativas."},
+{t:"pic4",n:"Capture Pallet Spots",pt:"Captura de posições de palete.",p:["RFPIC"],cust:1,o:[["—","Apenas para uso customizado"]]},
+{t:"pic4",n:"Scan From Location in RFPIC",pt:"Se a localização de origem precisa ser escaneada em cada pick.",p:["RFPIC"],
+ o:[["No","O campo From Location é preenchido pelo sistema, sem scan"],["Yes","A localização de origem tem de ser escaneada a cada pick"]]},
+{t:"pic4",n:"Apply Mask to UI in RFPIC",pt:"Mascara caracteres da UI para impedir digitação no lugar da leitura.",p:["RFPIC"],
+ o:[["Left 01 … Left 25","Mascara de 1 a 25 caracteres a partir da esquerda"],["Right 01 … Right 25","Mascara de 1 a 25 caracteres a partir da direita"]],
+ d:"Controle antifraude explícito no manual: existe para <b>impedir que o operador digite a UI em vez de escaneá-la</b>."},
+{t:"pic4",n:"Inventory Count Investigation Type",pt:"Abrangência dos registros ICIN gerados por divergência no count back.",p:["RFPIC","ICIN"],
+ o:[["Investigation for Every Picked Unconfirmed Order and OPID","Gera ICIN para TODO o inventário on order do armazém cujos níveis batam com os do palete picado com variância"],["(em branco)","Gera ICIN somente para o palete corrente com variância — os demais paletes de pedidos não confirmados com o mesmo inventário não recebem ICIN"]],
+ d:"Quando o supervisor entra para investigar: <b>Y (Resolved)</b> → nenhum ICIN para o palete corrente, mas ICIN é criado para todos os outros paletes de pedidos abertos cujos três primeiros níveis batam. Ao escolher Resolved ele confirma a quantidade: se bate com o sistema, nenhum ICIN; se a quantidade informada for MENOR, a diferença vai para hold <code>SUSP</code> e os ICINs são gerados; se for MAIOR, aparece «Move excess to designated location with label» e os ICINs são gerados. <b>N (Not Resolved)</b> → nenhum ICIN e o operador é orientado a repicar a linha."},
+
+/* ============== RFPIC (5) ============== */
+{t:"pic5",n:"Inventory Count Display Type",pt:"Dispensa a contagem quando entrada, saída e cadastro batem entre si.",p:["RFPIC"],
+ o:[["Ignore Count When Outbound Qty = Inbound Qty = Item Setup Qty","Nenhuma contagem é exigida quando a quebra padrão do item é igual à quantidade de entrada e à de saída — ou seja, um palete cheio foi recebido e está saindo inteiro"]],
+ d:"Para produto de <b>variable quantity breakdown</b>, a contagem é dispensada quando a quebra de saída bate com a quebra de entrada."},
+{t:"pic5",n:"Use Tie/Hi/Loose to Calculate Inventory Count Quantity",pt:"Forma como o operador informa a contagem de retorno.",p:["RFPIC"],
+ o:[["No","O operador digita a quantidade total do produto na localização"],["Yes","O operador informa tie, hi e loose e o sistema calcula o total"]]},
+{t:"pic5",n:"Inventory Count for Pallet Pick in RFITLV",pt:"Count back em picking de palete cheio dentro do tasking.",p:["RFITLV"],
+ o:[["No","Count backs desativados para picks de palete cheio no RFITLV"],["Yes","Count backs seguem as regras normais também no palete cheio"]],
+ d:"Um dos <b>dois únicos campos do MRFP dedicados ao RFITLV</b>. Em operação de tasking com alto volume de palete cheio, o No costuma ser o que viabiliza o ritmo."},
+{t:"pic5",n:"Pick Mode in RFITLV",pt:"Se o operador escolhe a tarefa ou recebe uma de cada vez.",p:["RFITLV"],
+ o:[["Use Pick List","A pick list normal é exibida e o operador escolhe em qual tarefa trabalhar"],["One Task at a Time","O operador vê UMA tarefa por vez, não pode selecionar da lista nem pular"]],
+ d:"<b>Este é o campo que converte a ordem sugerida pelo task engine em ordem obrigatória.</b> Com «Use Pick List» a discricionariedade volta para o operador e boa parte do ganho do tasking se perde."},
+{t:"pic5",n:"Validate Item and Other Levels Special Mode",pt:"Extração de quantidade do código de barras GS1 e validação dos níveis 1/2.",p:["RFPIC","BAPR"],
+ o:[["Read Qty From Bar Code, Validate Item/Lot if exists in the bar code by BAPR setting (1)","Extrai a quantidade do código GS1 e valida níveis 1/2 contra o código lido"],["Validate Item After Location Field (2)","A validação dos níveis 1/2 ocorre DEPOIS que o operador informa a localização destino"]],
+ d:"Na opção 1, se a quantidade for <b>digitada em vez de lida</b> e não bater com a quantidade da linha do pedido, aparece mensagem de erro e <b>é preciso aprovação de supervisor</b> para concluir o pick."},
+{t:"pic5",n:"Pick Background Substitution Rules",pt:"Regras de substituição em background no picking.",p:["RFPIC"],res:1,o:[["—","Reservado para uso futuro"]]},
+{t:"pic5",n:"Location Validation in RFPK - CART Pick",pt:"Exige leitura da localização no wave pick em modo carrinho.",p:["RFPK"],
+ o:[["No","A leitura da localização NÃO é exigida em cart pick"],["Yes","A leitura da localização é exigida em cart pick"]]},
+{t:"pic5",n:"Override System-Assigned OPID",pt:"Se o operador pode sobrescrever o OPID atribuído pelo sistema.",p:["RFPIC"],
+ o:[["Allow","Pode sobrescrever digitando ou escaneando por cima"],["Disallow","O campo OPID fica protegido"],["Warning","Aparece o aviso «OPID has been changed. Y = Continue. No = Reverse the Value» — Y aceita a troca, No cancela e devolve o OPID original"]]}
+);
+</script>
+<script>
+F.push(
+/* ============== MISCELLANEOUS ============== */
+{t:"misc1",n:"Display Order Lines by Item/Location in RFPI",pt:"Ordenação das linhas de pedido no RFPI.",p:["RFPI"],
+ o:[["Item","Linhas ordenadas por código de item"],["Location","Linhas ordenadas por código de localização"]]},
+{t:"misc1",n:"Picklist Rules in RF Relocate",pt:"Se a localização de origem vem de pick list, exige scan, ou ambos.",p:["RFRL"],
+ o:[["Picklist and validation","O operador escolhe na pick list E escaneia a origem para validar"],["Picklist. No validation","(default) Escolhe na pick list, sem scan"],["No picklist. Must validate","Sem pick list — a origem tem de ser escaneada"]]},
+{t:"misc1",n:"Validation Rules for Relocate to Pick Line",pt:"O que acontece ao relocar para pick line não configurada para o produto.",p:["RFRL","PIIT"],
+ o:[["Stop operator from proceeding","Bloqueia a relocação para pick line não configurada no PIIT"],["Allow operator to proceed","Exibe aviso, mas o operador pode ignorá-lo pressionando F3 para processar"],["Omit validation of location","Sem restrição alguma"]]},
+{t:"misc1",n:"Validate Level Number in Physical",pt:"Validação de número de nível no inventário físico.",p:["Physical"],
+ o:[["<valor>","Campo opcional"]],
+ d:"Detalhamento no <b>Physical Inventory Guide</b> (manual F)."},
+{t:"misc1",n:"Validate Quantity in Order Move",pt:"Se o operador informa a quantidade ao movimentar produto no RFST.",p:["RFST"],
+ o:[["Yes","O operador informa a quantidade movimentada — o número de caixas/unidades atribuído a um OPID no RFPIC"],["No","A quantidade não é informada"]]},
+{t:"misc1",n:"Validate From Location in Order Move",pt:"Se a localização de origem é exigida no RFST.",p:["RFST"],
+ o:[["Yes","O operador informa a localização de origem"],["No","A origem não é exigida"]]},
+{t:"misc1",n:"Location Type of To Location in Order Move",pt:"Que tipo de localização pode ser usada como destino no RFST.",p:["RFST"],
+ o:[["Any Location","Qualquer localização"],["Staging Location Only","Só staging"],["Pick Location Only","Só pick"],["Staging Location Excluding Door Location","Staging, exceto localizações de porta"]]},
+{t:"misc1",n:"Allow Directed Move in RF Relocate",pt:"Permite que o sistema escolha a melhor localização destino na relocação.",p:["RFRL","ILOP"],
+ o:[["Yes","O sistema seleciona a melhor localização destino conforme os parâmetros de directed move do ILOP"],["No","O operador escolhe manualmente"]]},
+{t:"misc1",n:"Display From Relocation Quantity in RF Relocate",pt:"Exibe a quantidade da localização de origem já no campo QTY.",p:["RFRL"],
+ o:[["Yes","A quantidade aparece no campo QTY e o cursor vai para LOC TO; o operador reloca tudo ou pressiona F9 para alterar"],["No","A quantidade não é exibida"]],
+ d:"A quantidade é exibida em formato «cooked» — <b>1 palete/25 caixas</b> em vez de 125 caixas. Duas condições precisam ser atendidas: todo o produto da localização pertence à mesma entidade de inventário; e a quantidade contém mais de um tipo de SKU. Pensado para operações em que relocar tudo é a regra, não a exceção."},
+{t:"misc1",n:"Allow RFCY Supervisor Count",pt:"Contagem de supervisor no RFCY.",p:["RFCY"],res:1,o:[["—","Reservado para uso futuro"]]},
+{t:"misc1",n:"Print Inventory Access/REPI Quantity Label",pt:"Impressão de etiqueta de quantidade de ressuprimento.",p:["REPI"],res:1,o:[["—","Reservado para uso futuro"]]},
+{t:"misc1",n:"Document Code for Quantity Labels",pt:"Documento usado nas etiquetas de ressuprimento.",p:["REPI","DOCU"],cust:1,
+ o:[["<código de documento>","Documento das etiquetas de ressuprimento"]],
+ d:"<b>Exige documento customizado.</b>"},
+
+/* ============== MISCELLANEOUS (2) ============== */
+{t:"misc2",n:"Use Pick Ticket Instead of RF Pick",pt:"Retira do RFPK as linhas com pick method CART ou EACH.",p:["RFPK"],
+ o:[["Yes","Operadores no RFPK NÃO acessam linhas com pick method CART ou EACH — essas linhas são picadas manualmente fora do RFPK"],["No","Acesso total a todas as linhas, qualquer que seja o pick method"]]},
+{t:"misc2",n:"Rules for Uniqueness of Serial Number",pt:"Como o sistema checa números de série duplicados na captura de process values.",p:["RFIPS","RFOPS"],
+ o:[["Per Document","Nenhum número de série duplicado dentro do mesmo recebimento/pedido"],["Per Item for a Document","Nenhum duplicado para o mesmo item num mesmo recebimento/pedido"],["Per Entity for a Document","Nenhum duplicado dentro da mesma entidade de inventário num mesmo recebimento/pedido"],["(em branco)","Duplicados permitidos sem restrição"]],
+ d:"Violada a regra, <b>o operador não consegue prosseguir</b>."},
+{t:"misc2",n:"Allow Merging Orders/Items to One OPID Within Load (RFMG)",pt:"Permite consolidar pedidos/itens num único OPID dentro da mesma carga.",p:["RFMG"],
+ o:[["<conforme setup>","Ver a seção de merge de OPIDs no RFMG"]]},
+{t:"misc2",n:"Allow Merging Up To Level (RFMG)",pt:"Até que nível de inventário o merge pode misturar entidades.",p:["RFMG"],
+ o:[["Level 1","Merge até o nível 1"],["Level 2","Merge até o nível 2"],["Level 3","Merge até o nível 3"]],
+ d:"Exemplo do manual: com Level 1, ao juntar dois paletes com lotes e pallet IDs diferentes, <b>o lote e o pallet ID ajustados para fora se perdem</b> e a quantidade do lote/pallet ID ajustado para dentro é acertada. Decisão com impacto direto em rastreabilidade."},
+{t:"misc2",n:"Refresh Screen After Each Relocation (RFRL)",pt:"Limpa a tela do RFRL depois de cada relocação.",p:["RFRL"],
+ o:[["Yes","Uma tela em branco é exibida após cada relocação"],["No","A tela não é limpa"]]},
+{t:"misc2",n:"Confirm OPID for Pick Method in RFCO",pt:"Se linhas com pick method CART podem ter o OPID confirmado no coletor.",p:["RFCO","CHOF"],
+ o:[["CART","Linhas com pick method CART podem ter o OPID confirmado no RFCO"],["(em branco)","Linhas CART só podem ser confirmadas no CHOF"]]},
+{t:"misc2",n:"RF Relocation Executed by",pt:"Que leitura dispara a execução da relocação.",p:["RFRL"],
+ o:[["Scan Location to Execute Relocation","A leitura da localização de origem executa a relocação — F3 (Process) não é necessário"],["UI Scan Only","A leitura da UI executa a relocação"],["Scan Location to Execute Relocation; UI Scan Only","As duas leituras são exigidas"]]},
+{t:"misc2",n:"Allow Mixed Pallet",pt:"Relocação de palete misto em uma única ação.",p:["RFRL"],
+ o:[["Allow Relocation of Mixed Pallets in RFRL","Permite relocar palete misto (vários itens, lotes, date codes) de uma vez"],["(em branco)","Não permitido"]],
+ d:"A relocação por licença de palete <b>move todos os registros de inventário associados ao palete</b>."},
+{t:"misc2",n:"Show RF Confirm OPID Summary",pt:"Resumo do pedido por OPID na confirmação.",p:["RFCO"],
+ o:[["Yes","Exibe um pop-up com o resumo do pedido para cada OPID — pick method e total de unidades"],["No","Sem resumo"]]},
+{t:"misc2",n:"Create RF Confirm OPID Audit",pt:"Registro de auditoria da confirmação de OPID.",p:["RFCO","LOOR"],
+ o:[["Yes","Insere uma mensagem com time-stamp no Time Block do LOOR indicando que o OPID foi confirmado no RFCO"],["No","Nenhum registro é inserido"]]},
+{t:"misc2",n:"RFOA Audit Level",pt:"Nível de inventário usado na auditoria de produto em staging antes do carregamento.",p:["RFOA"],
+ o:[["Level 1","Contagem por item do pedido"],["Level 2","Contagem por lote do pedido"],["Level 3","Contagem no nível 3"],["Level 4","Contagem no nível 4"]]},
+{t:"misc2",n:"RFOPS Sort Sequence Code (SOSE)",pt:"Ordenação dos process values na captura outbound.",p:["RFOPS","SOSE"],
+ o:[["<código SOSE>","Reordena a lista de process values"],["(em branco)","Ordem natural"]],
+ d:"Exemplo do manual: uma lista não ordenada traz <b>carton ID, carton ID, carton ID, peso, peso, peso</b>; após o sort, ela vira <b>carton ID, peso, carton ID, peso, carton ID, peso</b> — a sequência lógica de trabalho."},
+
+/* ============== MISCELLANEOUS (3) ============== */
+{t:"misc3",n:"Other Inventory Count Programs",pt:"Em quais programas RF, além do RFPIC, o count back é executado.",p:["RFPU","RFRL","RFRP"],
+ o:[["<seleção de programas>","Os programas escolhidos passam a exigir count back"]]},
+{t:"misc3",n:"Activate Inventory Count",pt:"Quando o count back é disparado nesses outros programas.",p:["RFPU","RFRL","RFRP"],
+ o:[["Always","Contagem a cada put-away, relocação ou ressuprimento"],["Never","Desativado"],["If Quantity Reaches or Falls Below Threshold Quantity","Só quando a quantidade cai até o limite definido"]],
+ d:"<b>Qual localização é contada depende da atividade:</b> em put-away conta-se sempre a localização DESTINO; em relocação e ressuprimento conta-se a localização de ORIGEM."},
+{t:"misc3",n:"Inventory Count Rules",pt:"O que fazer quando a contagem não bate com o saldo, nesses programas.",p:["RFPU","RFRL","RFRP"],
+ o:[["Require Supervisor Override","Um supervisor precisa entrar e aprovar a divergência"],["Ignore Investigation But Lock the Entity","Reservado para uso futuro"],["Ignore Investigation","O operador segue normalmente para a próxima operação"]]},
+{t:"misc3",n:"Threshold Quantity to Initiate Count",pt:"Limite de quantidade que dispara a contagem.",p:["RFPU","RFRL","RFRP"],
+ o:[["<quantidade>","Limite para iniciar o count back"]],
+ d:"Só disponível se <code>Activate Inventory Count</code> (desta aba) = «If Quantity Reaches or Falls Below Threshold Quantity»."},
+{t:"misc3",n:"Inventory Count for All RF Based On",pt:"Se a contagem é por item ou por entidade de inventário.",p:["RFPU","RFRL","RFRP","RFPIC"],
+ o:[["Item","O operador conta cada item da localização"],["Item Count for Pick Line Locations, Entity Count for Rest of Locations","Por item nas pick lines, por entidade nas demais"],["(em branco)","O operador conta cada entidade de inventário da localização"]],
+ d:"Escolha com forte impacto no tempo de contagem: em localização com muitas entidades do mesmo item, contar por item é bem mais rápido — e menos preciso para rastreabilidade."},
+{t:"misc3",n:"Rules to Allow Short / Delete Line in RFIPS",pt:"Se linhas de recebimento podem ser encurtadas ou apagadas no RFIPS.",p:["RFIPS"],
+ o:[["Disallow Short / Delete Line","Não permitido"],["Allow Short / Delete Line","Permitido"]]},
+{t:"misc3",n:"Suggested Location Rules in RFST",pt:"Qual localização é sugerida como destino na movimentação de pedido.",p:["RFST","SELO"],
+ o:[["Follow Order","A sugestão é a localização onde o último OPID foi colocado — sempre o destino escolhido na linha anterior"],["Follow Assigned Staging Location","A sugestão é o staging atribuído à linha no SELO ou no Wave Manager, e NÃO muda mesmo se o operador sobrepuser o destino sugerido"]]},
+{t:"misc3",n:"Display To-Location in RFST",pt:"Exibe ou esconde a localização destino sugerida.",p:["RFST"],
+ o:[["Yes","A sugestão é exibida"],["No","A sugestão não é exibida"]],
+ d:"A opção Yes só fica disponível se <code>Suggested Location Rules in RFST</code> estiver ativo."},
+{t:"misc3",n:"Default Staging Warehouse/Location Code in CASE",pt:"Armazém e staging default em modo CASE.",p:["RFPIC"],cust:1,o:[["—","Apenas para uso customizado"]]},
+{t:"misc3",n:"Enter Adjustment Information",pt:"Exige código de ajuste, motivo e observações em cada ajuste de RF.",p:["RFAJ","ADJU","REAS"],
+ o:[["Yes","O operador informa código de ajuste (ADJU), código de motivo (REAS) e observações a cada ajuste"],["No","Nada disso é solicitado"]],
+ d:"Campo decisivo para rastreabilidade de ajustes e para análise posterior de causa raiz de divergência."},
+{t:"misc3",n:"Allow Relocation of Multiple Pallets in RFRL",pt:"Reloca vários paletes lendo várias UIs e informando o destino uma vez.",p:["RFRL","MHET","COMP"],
+ o:[["Yes","Relocação múltipla liberada"],["No","Um palete por vez"]],
+ d:"Mesmas cinco restrições dos demais movimentos múltiplos: mesmo nível 1, equipment tracking no COMP, <code>Location Required</code> no MHET, sem holds misturados e dentro da capacidade do equipamento."},
+
+/* ============== MISCELLANEOUS (4) ============== */
+{t:"misc4",n:"Allow Replenishment of Multiple Pallets in RFRP",pt:"Ressupre vários paletes numa única etapa.",p:["RFRP","MHET","COMP"],
+ o:[["Yes","Ressuprimento múltiplo liberado"],["No","Um palete por vez"]],
+ d:"Mesmas cinco restrições dos demais movimentos múltiplos."},
+{t:"misc4",n:"Allow Mixed Put-Away, Move up to Inventory Level",pt:"Até que nível de inventário paletes misturados podem ser movidos juntos.",p:["RFCH","RFPU","RFST","RFRL","RFRP","OLOP"],
+ o:[["Up to level 1","Paletes com níveis 2, 3 e 4 diferentes podem ir juntos"],["Up to level 2","Mistura permitida até o nível 2"],["Up to level 3","Mistura permitida até o nível 3"],["(em branco)","Produto misto não pode ser movido numa única etapa"]],
+ d:"Exemplo do manual: com «Up to level 1», paletes de recebimentos, agendamentos e cargas de entrada <b>diferentes</b> podem ir na mesma empilhadeira e ser endereçados juntos. Este é um dos poucos campos do MRFP que atinge <b>seis programas de uma vez</b>."},
+{t:"misc4",n:"Reason Code Required to Override System-Assigned Location",pt:"Exige código de motivo quando o operador sobrepõe a localização sugerida.",p:["RFCH","RFPU","RFRL"],
+ o:[["Yes","Código de motivo obrigatório ao sobrepor a localização ou pedir alternativa"],["No","Sem código de motivo"],["Yes with Location Overridden","Reservado para uso futuro"]],
+ d:"<b>Apenas para overrides em RFCH/RFPU</b> o código de motivo é gravado na linha do recebimento e um time stamp é criado. É a contraparte investigativa do <code>Max. Number of F3 (NX)</code>: um limita, este registra."},
+{t:"misc4",n:"Max. Number of F3 (NX) Allowed Per ILOP Sequence in RFRL",pt:"Quantas vezes o operador pode pedir outra localização sugerida na relocação.",p:["RFRL","ILOP"],
+ o:[["<número>","Limite de vezes que F3 (NX) exibe outra sugestão de destino"]]},
+{t:"misc4",n:"Allow Multiple Pallet Moves in RFST",pt:"Move vários paletes numa única etapa na movimentação de pedido.",p:["RFST","MHET","COMP"],
+ o:[["Yes","Movimento múltiplo liberado"],["No","Um palete por vez"]],
+ d:"Mesmas cinco restrições dos demais movimentos múltiplos."},
+{t:"misc4",n:"Show Quantity Breakdown Screen",pt:"Exibe o quantity breakdown do item como pop-up em sete programas RF.",p:["RFPIC","RFPK","RFRL","RFPR","RFRP","RFCH","RFPU"],
+ o:[["Yes","O breakdown aparece como pop-up em RFPIC, RFPK, RFRL, RFPR, RFRP, RFCH e RFPU"],["No","Não aparece"]]},
+{t:"misc4",n:"Allow Skipping of Inbound Serial Number Validation in RFOPS",pt:"Dispensa a validação do número de série de entrada na expedição.",p:["RFOPS"],
+ o:[["Yes","A validação pode ser pulada e o sistema gera um novo número de série de saída"],["No","A validação é obrigatória"]],
+ d:"Existe para eliminar o scan de validação caixa a caixa. Fluxo no coletor: o operador escolhe <b>ME (Manual Entry)</b>, informa o peso e pressiona <b>F1 (SE)</b> para gerar o número de série. Caso de uso citado: pedido de transferência de produto serializado entre contas."},
+{t:"misc4",n:"Allow Weight Reduction for Standard Weight Item in RFOPS",pt:"Reduz produto de peso padrão informando quantidade em vez de peso.",p:["RFOPS"],
+ o:[["Yes","O operador reduz informando uma quantidade — ex.: 5CS — que precisa ser menor ou igual à quantidade do pedido"],["No","Não permitido"]],
+ d:"Ao pressionar <b>F2 (RC)</b> o coletor exibe o prompt de confirmação."},
+{t:"misc4",n:"Enter Gross Weight in RFSC",pt:"Exige peso bruto ao fechar a caixa na cartonização.",p:["RFSC","DITP"],
+ o:[["Yes","O operador informa o peso bruto ao fechar a caixa"],["No","Não é solicitado"]],
+ d:"A unidade de medida de peso da caixa é definida no <b>DITP</b> (Depositor Item Profile)."},
+{t:"misc4",n:"Allow Put-Back of Outstanding REPI Quantity",pt:"O que fazer com o saldo quando o ressuprimento é parcial.",p:["REPI","RFRP"],
+ o:[["No","Um segundo ressuprimento com o saldo é criado para a pick line original"],["Yes","O operador é convidado a executar o segundo ressuprimento — na pick line original ou em outra"],["Cancel REPI Task","Se o saldo na pick line for MAIOR que a quantidade on order, o segundo ressuprimento é apagado; se não for, ele é criado para a pick line original (igual ao No)"]],
+ d:"Cenário do manual: quebra de 50 caixas/palete, ressuprimento de 45 caixas do bulk (produto bloqueado ou avariado impediu o palete cheio), pedido de 10 caixas — o saldo em aberto é de 5 caixas."},
+{t:"misc4",n:"Enable UI Scanning in Cycle Counts",pt:"Leitura de UI na contagem cíclica.",p:["RFCY"],cust:1,o:[["—","Apenas para uso customizado"]]},
+{t:"misc4",n:"Suspend Flow Advancement in Outbound Audit",pt:"Impede o avanço de fluxo mesmo quando a auditoria fecha certa.",p:["RFOA"],
+ o:[["Yes","A linha do pedido NÃO avança de fluxo mesmo que a contagem bata com a quantidade"],["No","A linha avança quando a contagem bate"]]},
+
+/* ============== MISCELLANEOUS (5) ============== */
+{t:"misc5",n:"Retain OPID to in RFMG",pt:"Mantém o OPID de destino na tela após o merge.",p:["RFMG"],
+ o:[["Yes","O valor de OPID destino continua na tela para o operador seguir consolidando no mesmo OPID"],["No","O campo é limpo a cada merge"]]},
+{t:"misc5",n:"Validate Manual Entry Process in RFOPS",pt:"Validações aplicadas quando o operador digita peso variável ou número de série em vez de escanear.",p:["RFOPS","IPRO","ITEM"],
+ o:[["Yes","Três validações: o comprimento e o tipo de dado têm de bater com o setup do IPRO; o peso/série de SAÍDA tem de bater com o de ENTRADA; e, se o peso não bater, ele precisa estar dentro do percentual de tolerância definido no ITEM"],["No","Só o comprimento e o tipo de dado precisam bater com o IPRO"]],
+ d:"<b>É este campo — e não o flag Inbound/Outbound = B do IPRO — que ativa a comparação entrada x saída.</b> O IPRO com B apenas solicita a captura nas duas pontas. A comparação também exige <code>Transfer Value to Inventory = Y</code> no IPRO. Ponto em aberto para validação empírica: o texto 4.2 fala em «manually entering», sem esclarecer se o escopo cobre também valores escaneados."},
+{t:"misc5",n:"Disallow REPI When Location Reaches Maximum Capacity",pt:"Cancela ressuprimentos que estourariam a capacidade da pick line.",p:["REPI","CCOP"],
+ o:[["Yes","O ressuprimento é cancelado quando quantidade a ressuprir + saldo na pick line excede a capacidade da localização"],["No","O ressuprimento não é cancelado"]],
+ d:"<b>Duas ressalvas:</b> produto em hold <code>SUSP</code> não entra no saldo da pick line; e a opção Yes <b>é ignorada</b> se houver override de shelf life no CCOP para o pedido que disparou o ressuprimento."},
+{t:"misc5",n:"Validate Serial Number (SN) From Picking Process",pt:"Reconferência do número de série no momento do packing.",p:["RFSC","RFPIC"],
+ o:[["Yes","Validação ativa no RFSC — um número de série válido tem de ser lido para todo produto embalado"],["No","Validação desativada no RFSC"]],
+ d:"A finalidade do scan adicional é garantir que <b>o número de série lido no RFPIC é o mesmo que está entrando na caixa</b> durante o packing."},
+{t:"misc5",n:"Display Minimum Number of REPI Records in Demand Mode",pt:"Mostra só os ressuprimentos necessários para atender o pedido.",p:["REPI","RFRP"],
+ o:[["Yes","Só aparecem os ressuprimentos necessários para cobrir a quantidade do pedido; os que existem apenas para atingir o mínimo da localização não aparecem em modo demanda"],["No","Todos aparecem"]],
+ d:"Exemplo do manual: 255 caixas na pick location, 305 on order. Existem três ressuprimentos somando 144 caixas, mas só 60 são necessárias para o pedido — <b>apenas o ressuprimento de 60 aparece</b> em demand mode."},
+{t:"misc5",n:"Override Quantity Breakdown - Actual (if > Std) or Std",pt:"Escolhe entre a quebra real do palete e a quebra padrão do item.",p:["RFCH","RFMI"],
+ o:[["Override Quantity Breakdown Type","Aplica as três regras descritas abaixo em RFCH e RFMI"],["(em branco)","Comportamento padrão"]],
+ d:"<b>Regras:</b> se a quantidade do palete associada à UI for MENOR que a quebra padrão do item, usa a quebra padrão; se for MAIOR OU IGUAL, usa a quebra real; e, em quebra palete/caixa/unidade, a configuração caixa/unidade não muda. <b>Atenção:</b> a quebra informada no RFCH sobrescreve a quebra do ENRE e do EDI."},
+{t:"misc5",n:"Display Process Description in RFOPS",pt:"Mostra a descrição do process code além do código.",p:["RFOPS"],
+ o:[["Yes","Exibe a descrição do item process code"],["No","Exibe apenas o código, sem descrição"]]},
+{t:"misc5",n:"Allow Entry of Adjustment Code in RFMI",pt:"Se o operador informa o código de ajuste no merge de inventário.",p:["RFMI","ATMP"],
+ o:[["Yes","O operador informa o código de ajuste do merge"],["No","Usa o código de ajuste default configurado no ATMP (Action Template Setup)"]]},
+{t:"misc5",n:"REPI Pick Location Capacity Based on UI",pt:"Se a capacidade da pick line é medida em UIs ou em unidades.",p:["REPI"],
+ o:[["Yes","A capacidade é medida pelo NÚMERO DE UIs — com capacidade de dois paletes e duas UIs na localização, ela é considerada cheia ainda que as duas UIs sejam paletes parciais"],["No","A capacidade é medida pelo número real de unidades"]],
+ d:"Localização considerada cheia = <b>nenhum ressuprimento ocorre</b>. Com Yes, dois paletes parciais travam o ressuprimento; é uma das causas mais comuns de pick line que não reabastece."}
+);
+</script>
+<script>
+/* ===== Traducción ES — nombres de campo permanecen en inglés (tal como aparecen en pantalla) ===== */
+const T={};
+const t=(k,s,o,d)=>T[k]={s,o,d};
+
+const TABS_ES={
+ "rfch-q":["Recepción — RFCH","Controla qué aparece en la pick list de RFCH cuando el operador hace una consulta. Ningún campo de esta pestaña cambia reglas de negocio — solo la información mostrada en la pantalla del terminal."],
+ "rfch1":["Recepción — RFCH","El núcleo del comportamiento de RFCH: creación de líneas, inventario duplicado, conteo por tie/hi/loose, tratamiento de variación y reglas de quantity breakdown."],
+ "rfch2":["Recepción — RFCH","Validaciones complementarias en la recepción: peso/cubicaje del artículo, concatenación de niveles, modos especiales de recepción, puerta y almacenamiento de múltiples pallets."],
+ "rfch3":["Recepción — RFCH","Reglas de excepción y productividad: diferencia de cantidad, pallet mixto, escaneo repetitivo (grocery style), ordenamiento de las líneas y límites de pallet."],
+ "rfch4":["Recepción — RFCH","Pestaña corta: comportamiento de la ubicación de staging sugerida y permiso para poner en cero líneas de recepción."],
+ "rfchs":["Recepción — RFCH","Campos que valen simultáneamente para RFCH y RFPU. Aquí se define la coincidencia de cantidad con ENRE, el límite máximo por línea y la fecha de confirmación."],
+ "rfpu":["Recepción — RFPU","Comportamiento del almacenamiento: validación de pick line, staging (almacenamiento en tres etapas), variación, confirmación de la ubicación sugerida y movimiento de múltiples pallets."],
+ "pic1":["Expedición — RFPIC / RFPK","Modo de picking por defecto, reglas de pallet duplicado, picking parcial, holds suspendidos, reabastecimiento dentro de RFPIC y despliegue del bloque de pallets."],
+ "pic2":["Expedición — RFPIC / RFPK","Conteo de inventario (count back) en el picking, generación e impresión del OPID, y ordenamiento de la pick list por SOSE."],
+ "pic3":["Expedición — RFPIC / RFPK","Atajos de digitación, segregación de peligrosos, validación por UPC, bookmark en la pick list y overrides de supervisor en RFPK."],
+ "pic4":["Expedición — RFPIC / RFPK","Reubicación de producto bloqueado, SKU de despliegue vs. SKU de picking, múltiples OPIDs, staging por defecto, máscara de UI e investigación de conteo (ICIN)."],
+ "pic5":["Expedición — RFPIC / RFPK","Reglas finas de count back, los dos campos que gobiernan RFITLV y el control de override del OPID asignado por el sistema."],
+ "misc1":["Varios","Reubicación (RFRL) y movimiento de pedido (RFST): pick list, validación de pick line, directed move y despliegue de la cantidad de origen."],
+ "misc2":["Varios","Unicidad de número de serie, merge de OPIDs (RFMG), ejecución de la reubicación, confirmación de OPID (RFCO) y auditoría de salida (RFOA)."],
+ "misc3":["Varios","Count back fuera de RFPIC: en qué programas ocurre, cuándo se dispara, qué hacer ante la diferencia y la base del conteo (artículo vs. entidad)."],
+ "misc4":["Varios","Movimiento de múltiples pallets en RFRP/RFRL/RFST, almacenamiento mixto, código de motivo para override de ubicación y captura de peso en RFOPS/RFSC."],
+ "misc5":["Varios","Reabastecimiento (REPI): put-back, capacidad de la pick line y modo demanda. También validación de entrada manual en RFOPS y quantity breakdown."]
+};
+
+/* ---------- RFCH QUERIES ---------- */
+t("rfch-q|Customize Query Results in RFCH","Activa o desactiva la personalización de la pick list de RFCH en modo consulta.",
+ ["Los campos de abajo pasan a tener efecto: solo lo marcado como Yes aparece en la pick list","La personalización se ignora y aparecen todos los valores — código de cliente, número y línea de recepción, todos los niveles de inventario, etc."],
+ "Es el interruptor maestro de la pestaña. Con <b>No</b>, los nueve campos siguientes no tienen efecto alguno.");
+t("rfch-q|Receipt Number","Muestra el número de recepción en la pick list de consulta.",["Aparece en la pick list","No aparece"]);
+t("rfch-q|Receipt Line Number","Muestra el número de línea de la recepción en la pick list.",["Aparece en la pick list","No aparece"]);
+t("rfch-q|Inventory Level 1","Muestra el nivel 1 de inventario (normalmente el artículo) en la pick list.",["Aparece en la pick list","No aparece"]);
+t("rfch-q|Inventory Level 2","Muestra el nivel 2 de inventario (lote, date code) en la pick list.",["Aparece en la pick list","No aparece"]);
+t("rfch-q|Inventory Level 3","Muestra el nivel 3 de inventario en la pick list.",["Aparece en la pick list","No aparece"]);
+t("rfch-q|Inventory Level 4","Muestra el nivel 4 de inventario en la pick list.",["Aparece en la pick list","No aparece"]);
+t("rfch-q|Warehouse Code","Muestra el código de almacén en la pick list.",["Aparece en la pick list","No aparece"]);
+t("rfch-q|Quantity","Muestra la cantidad en la pick list.",["Aparece en la pick list","No aparece"]);
+t("rfch-q|Hold Code","Muestra el código de bloqueo (hold) en la pick list.",["Aparece en la pick list","No aparece"]);
+
+/* ---------- RFCH ONLY ---------- */
+t("rfch1|Label Document Printed","Documento de etiqueta que se imprime cuando el operador crea una nueva línea de recepción en RFCH.",
+ ["Se le solicita al operador imprimir el documento al crear una nueva línea","No se solicita ninguna impresión"],
+ "El documento indicado debe tener tipo <code>LA</code> (Label) en DOCU. Campo opcional.");
+t("rfch1|Show Temperature and Pallet Blocks","Define qué bloques de información puede completar el operador en cada recepción.",
+ ["No se muestra ningún bloque","Muestra los tres bloques","Solo el bloque de pallets","Solo tráiler/precinto","Solo temperatura","Tráiler/precinto y pallets","Temperatura y tráiler/precinto","Temperatura y pallets"],
+ "<b>Ninguna de estas opciones es obligatoria para el operador.</b> Activar la captura de temperatura permite que la digite en RFCH, pero no lo obliga. Si la captura debe ser obligatoria, el control tiene que venir de otro lado.");
+t("rfch1|Perform Trailer Checks","Secuencia de chequeos del tráiler antes de la descarga.",
+ ["El operador es guiado por una serie de chequeos de tráiler","No se solicita ningún chequeo"],
+ "Solo está disponible si la captura de número de tráiler está activada en <code>Show Temperature and Pallet Blocks</code>.");
+t("rfch1|Allow New Lines","Si el operador puede crear nuevas líneas de recepción directamente en el terminal, y cómo.",
+ ["Puede crear líneas con el comando CL (Create Lines); al terminar la última línea se le pregunta si marca la recepción como completa o crea una nueva línea","No puede crear líneas y no recibe la pregunta al final","No recibe la pregunta y el flujo del encabezado de la recepción NO avanza","Solo puede agregar línea si es una entidad de inventario ya existente en la recepción","Solo con login de supervisor autorizando la transacción"],
+ "Ejemplo de la opción 4: el operador recibió 20 cajas del pallet 123 y después encontró una caja más del mismo pallet — esa caja puede agregarse; una caja del pallet 456, que no está en la recepción, no puede.");
+t("rfch1|Allow Duplicate Inventory","Chequeo de inventario duplicado en RFCH cuando la línea es tipo U (Unknown) en ENRE.",
+ ["Ningún mensaje al recibir inventario duplicado","Pop-up al recibir entidad duplicada; el operador acepta o rechaza el escaneo","Pop-up al recibir UI duplicada; el operador acepta o rechaza","Bloquea — la entidad duplicada no puede recibirse","Bloquea — la UI duplicada no puede recibirse"],
+ "Vale <b>solo para líneas tipo U</b> creadas en ENRE.");
+t("rfch1|Default Staging Warehouse/Location Code","Almacén y ubicación de staging precargados en el almacenamiento en dos etapas con staging manual.",
+ ["Los campos Loc y Whse aparecen completados; el operador acepta o digita otros","El operador informa el staging manualmente"]);
+t("rfch1|Must Use Tie/Hi/Loose to Calculate Receiving Quantity","Obliga al conteo por capa/altura/suelto en lugar de la cantidad total.",
+ ["Campos Tie, Hi y Loose deshabilitados; el operador solo digita la cantidad total","El operador debe informar tie/hi/loose por línea y el campo Qty queda deshabilitado","Igual que Yes; si la cantidad calculada no coincide con la esperada en ENRE, el operador tiene un segundo intento — si persiste la diferencia, debe ser tratada por un supervisor en RFCV"],
+ "Ejemplo del manual: tie/hi/loose <code>5/10/03</code> = 53 cajas; <code>5/10/-1</code> = 49 cajas. La opción Yes existe para forzar conteos más precisos y reducir el error de recepción.");
+t("rfch1|Variance Rules","Quién puede ver y tratar la pantalla de variación cuando la cantidad digitada no coincide con la esperada.",
+ ["Cualquier usuario procesa la variación","Los no supervisores no pueden presionar F3 para poner la línea en cero","Al presionar F3, el no supervisor requiere login y aprobación de supervisor"],
+ "<b>La variación siempre queda registrada en LORE</b>, sea cual sea la opción — incluso cuando la pantalla de variación no se muestra.");
+t("rfch1|Tolerance Check for PO","Chequeo de tolerancia contra la orden de compra.",["Reservado para uso futuro"]);
+t("rfch1|Enter Quantity Breakdown for U-Type Line","Permite cambiar en el terminal el quantity breakdown de una línea tipo U.",
+ ["El breakdown no puede cambiarse en RFCH","El operador puede sobrescribir el breakdown digitado en ENRE","El breakdown del artículo se iguala automáticamente a la cantidad de línea digitada en RFCH"],
+ "Para Yes y para la tercera opción deben cumplirse <b>tres condiciones</b>: el artículo está configurado como variable quantity breakdown en ITEM; fue recibido en línea tipo U en ENRE; y la entidad de inventario es nueva (nunca antes recibida en el almacén).");
+t("rfch1|Expiry Date Rules","Suprime la pantalla de fecha de vencimiento en líneas tipo U.",
+ ["La pantalla de vencimiento NO se muestra, aunque la captura manual esté activa en el ITSH del artículo","La pantalla se muestra si la captura manual de vencimiento está activa en ITSH"]);
+t("rfch1|Enter/Change Hold Code","Nivel de acceso del operador al campo de hold en RFCH.",
+ ["(por defecto) Puede crear nuevos holds y cambiar los existentes","Puede crear nuevos holds, pero no cambiar los existentes","Tiene acceso al campo Hold, pero no puede cambiar el código","No tiene acceso al campo Hold — y en consecuencia no puede cambiar la cantidad"],
+ "<b>Las dos opciones restrictivas no funcionan</b> cuando existe un item hold profile configurado en IHOP y vinculado al artículo en ITEM.");
+
+/* ---------- RFCH ONLY (2) ---------- */
+t("rfch2|Validate Item Weight/Cube Setup","Verifica si el SKU base del artículo recibido tiene peso y cubicaje mayores que cero.",
+ ["No se hace ninguna verificación","Si el artículo reprueba, el operador debe informar los valores faltantes en RFCH antes de recibir la línea"],
+ "Cuando el operador completa los valores, <b>RFCH actualiza el Quantity Breakdown Block de ITEM</b> — es decir, el terminal graba en el maestro de artículos.");
+t("rfch2|Extra Charge Entry Type","Momento en que aparece la pantalla de cargos extra en la recepción.",
+ ["La pantalla aparece al terminar de chequear/descargar la línea","La pantalla aparece al salir de RFCH"],
+ "La captura de cargos extra en RF solo existe para cargos <b>por cliente</b> (perfil ECHP vinculado a un cliente). Los cargos extra vinculados a artículo no están soportados en RF.");
+t("rfch2|Concatenate Inventory Level in U-Type Line","Anexa el valor escaneado al nivel 2 ya digitado en ENRE, en vez de reemplazarlo.",
+ ["El valor leído se pega al inicio del nivel 2","El valor leído se pega al final del nivel 2","Sin concatenación"],
+ "Solo vale para líneas tipo U en las que el operador selecciona el número de recepción desde una pick list. Uso típico: la oficina crea la línea con el nivel 2 normal y el operador escanea un date code (ej.: <code>101101</code>) que se anexa a ese valor.");
+t("rfch2|Keep First Location Entry and Skip the Field","Repite la primera ubicación informada en las líneas siguientes.",
+ ["Después de la primera captura el operador salta el campo Location y almacena las demás líneas en la misma ubicación","La ubicación se pide en cada línea"]);
+t("rfch2|Allow Change to Receiving Mode","Permite alternar entre almacenamiento de una y de dos etapas dentro de RFCH.",
+ ["El operador alterna entre one-step y two-step put-away","El modo es fijo"]);
+t("rfch2|Special Receiving Mode Types","Activa un modo especial de recepción requerido por la operación.",
+ ["Recepción por línea U con lectura de serie como nivel de inventario","Almacenamiento en tres etapas — <b>requiere setup especial</b>","Almacenamiento en tres etapas","<b>Requiere setup especial</b>","Modos especiales desactivados"],
+ "Las opciones marcadas con <b>*</b> requieren configuración dedicada — ver la sección de almacenamiento en tres etapas en el capítulo de descarga en RFCH.");
+t("rfch2|Validate Inventory Level from Bar Code Using SCPR Code","Perfil de escaneo usado para validar niveles de inventario en la recepción.",
+ ["Valida los niveles leídos contra el perfil; un nivel inválido impide al operador continuar","Sin validación por SCPR"],
+ "Este es el <b>SCPR por defecto a nivel de cliente</b>. Puede ser sobrescrito por artículo en el campo <code>Scan Parameter Code for Inventory Validation (SCPR)</code> de ITEM.");
+t("rfch2|Door Rules","Si el operador puede seleccionar o cambiar la puerta (andén) en la recepción.",
+ ["No puede seleccionar ni cambiar la puerta","Puede informar y cambiar la puerta"]);
+t("rfch2|Display Quantity Breakdown","Muestra o suprime el quantity breakdown del artículo en la pantalla de RFCH.",
+ ["Se muestra el breakdown del artículo","El breakdown se suprime"]);
+t("rfch2|Allow Put-Away of Multiple Pallets in RFCH","Almacena varios pallets en un solo paso: el operador lee dos o más UIs e informa la ubicación destino una sola vez.",
+ ["Almacenamiento múltiple habilitado, respetando las restricciones","Un pallet a la vez"],
+ "<b>Cinco restricciones simultáneas:</b> todo el producto tiene el mismo nivel 1; equipment tracking activado en COMP; flag <code>Location Required</code> activo en MHET; los pallets no tienen hold codes mezclados; y la cantidad de pallets no excede la capacidad máxima del tipo de equipo.");
+t("rfch2|Enter Quantity Breakdown for P-Type Line","Permite cambiar en el terminal el quantity breakdown de una línea tipo P.",
+ ["El breakdown del artículo no puede cambiarse en RFCH","El operador puede sobrescribir el breakdown digitado en ENRE","El breakdown se iguala automáticamente a la cantidad de línea digitada en RFCH"],
+ "Las mismas tres condiciones de la versión U-Type, cambiando solo el tipo de línea: artículo variable quantity breakdown en ITEM, recibido en <b>línea tipo P</b> en ENRE, y entidad de inventario nueva.");
+t("rfch2|Update Expiry Date for P-Type Line","Permite sobrescribir la fecha de vencimiento en líneas tipo P.",
+ ["El operador puede sobrescribir el vencimiento","El vencimiento no puede cambiarse"],
+ "El item shipping profile (ITSH) vinculado al artículo debe tener <code>Enter Expiry Dates = Yes</code>.");
+
+/* ---------- RFCH ONLY (3) ---------- */
+t("rfch3|Capture Photo When Unloading First UI","Captura de imagen en la descarga de la primera UI.",["Captura activada","Captura desactivada"],"<b>Disponible solo en terminales Intermec CK71.</b>");
+t("rfch3|Capture Photo When UI is Put On Hold","Captura de imagen cuando una UI se pone en hold.",["Captura activada","Captura desactivada"],"<b>Disponible solo en terminales Intermec CK71.</b>");
+t("rfch3|Duplicate Receiving Rules if Qty. Entered < Qty. Received","Qué hacer cuando la cantidad digitada en RFCH es menor que la de ENRE.",
+ ["Crea una segunda línea con la diferencia","Pregunta al operador si pone en cero la segunda línea — Sí lleva al resultado de la opción 3, No al de la opción 1","Crea automáticamente una segunda línea con cantidad 0"],
+ "Ejemplo del manual: ENRE = 100 CS, RFCH = 99 CS. Con la opción 1 nace una segunda línea de 1 CS.");
+t("rfch3|Allow Mixed Pallet for Items With Same ILOP","Recepción de pallet mixto cuando los artículos comparten el mismo código ILOP.",
+ ["El pallet mixto puede recibirse para artículos del mismo ILOP","El pallet mixto no puede recibirse"]);
+t("rfch3|Use Repetitive Scan With ALIT Starting With Inventory","Activa el escaneo estilo abarrotes (grocery style) en la recepción.",
+ ["Escaneo repetitivo a partir del nivel 1","A partir del nivel 2","A partir del nivel 3","A partir del nivel 4"],
+ "Se usa para producto sin quiebre estándar pallet/caja — vestuario, por ejemplo — donde cada pieza debe leerse individualmente. Una lectura puede valer 1 unidad o cualquier otra cantidad definida; el sistema calcula el conteo por la cantidad de piezas leídas y por el setup de <b>ALIT</b>.");
+t("rfch3|Sort Sequence Code (SOSE)","Orden en que aparecen las líneas de la recepción en RFCH.",
+ ["Las líneas se ordenan según el código de sort sequence al digitar el número de recepción","Las líneas siguen el orden del número de línea de la recepción"]);
+t("rfch3|Receiving Qty. Must be Less Than or Equal to Item Pallet Qty.","Impide recibir pallets fuera del estándar (por encima del quiebre del artículo).",
+ ["Cantidad por encima del quiebre estándar es rechazada","Sin restricción"],
+ "Ejemplos con quiebre de 50 cajas/pallet: ENRE 1 PLT + RFCH 1 PLT \u2192 normal \u00b7 ENRE 1 PLT + RFCH 2 PLT \u2192 normal \u00b7 ENRE 1 PLT + RFCH 50 CS \u2192 normal \u00b7 <b>ENRE 1 PLT + RFCH 51 CS \u2192 rechazado</b> \u00b7 ENRE 1 PLT 30 CS + RFCH 1 PLT 31 CS \u2192 normal \u00b7 <b>ENRE 51 CS + RFCH 51 CS \u2192 rechazado</b>.");
+t("rfch3|Allow Skipping of Level Validation","Permite continuar la recepción aunque falle la validación de nivel por SCPR.",
+ ["El operador continúa recibiendo la línea aun con falla en la validación","La falla bloquea"],
+ "Solo aplica si el campo <code>Validate Inventory Level from Bar Code Using SCPR Code</code> (pestaña RFCH Only 2) está activo.");
+t("rfch3|Special Item Process Capture Mode","Momento en que se capturan los process values en la recepción.",
+ ["El operador escanea los process values ANTES de informar la ubicación de staging","Los process values se escanean DESPUÉS de la ubicación de staging"]);
+t("rfch3|Keep Last Location for One-Step Manual Put-Away","Repite la última ubicación usada en el almacenamiento manual de una etapa.",
+ ["La última ubicación se muestra en RFCH","El campo Location siempre viene vacío"]);
+
+/* ---------- RFCH ONLY (4) ---------- */
+t("rfch4|Always Prompt to Enter a Staging Location","Si la ubicación de staging sugerida se muestra o debe escanearse.",
+ ["La sugerencia en el campo L: se suprime y el operador debe escanear el staging","El campo L: viene con el staging sugerido y basta Enter para aceptarlo"],
+ "Atención a la lectura invertida: <b>No es el modo más estricto</b> (obliga al escaneo), Yes es el más rápido.");
+t("rfch4|Zero Out Receipt Lines","Quién puede poner en cero líneas de recepción en RFCH.",
+ ["Nadie puede ponerlas en cero","Cualquier usuario puede","Solo supervisores"]);
+
+/* ---------- RFCH SHARED ---------- */
+t("rfchs|Show Default Quantity in RFCH/RFPU","Muestra la cantidad recibida de ENRE como valor por defecto en el terminal.",
+ ["La cantidad de ENRE aparece por defecto en ambos programas; Enter confirma o se digita otra","La cantidad de ENRE no se muestra","La cantidad solo aparece en RFPU","La cantidad solo aparece en la pantalla de variación"],
+ "Campo de impacto directo en la exactitud: mostrar la cantidad esperada facilita el trabajo, pero también facilita la confirmación a ciegas.");
+t("rfchs|RFCH/RFPU Quantity Must Match ENRE Quantity","Regla de coincidencia entre la cantidad digitada en el terminal y la esperada en ENRE.",
+ ["Debe coincidir; si no, la línea no puede procesarse","No necesita coincidir; aviso solo cuando la recibida es MAYOR que la esperada","Genera aviso ante la diferencia, pero el operador continúa","Ningún aviso ante la diferencia","En RFCH no necesita coincidir; en RFPU no puede exceder la cantidad esperada","En RFCH debe coincidir; en RFPU no puede exceder"],
+ "Disponible <b>solo para líneas tipo P</b>.");
+t("rfchs|Supvr. Must Authorize Location Overrides in RFCH/RFPU/RFRL","Exige aprobación de supervisor para sobrescribir la ubicación asignada por el sistema.",
+ ["El override de ubicación requiere aprobación de supervisor","El operador sobrescribe sin aprobación"],
+ "<b>Excepción importante:</b> la aprobación del supervisor NO se exige para sobrescribir una ubicación de put-away por una ubicación de staging.");
+t("rfchs|Validate One Process Value","Lectura de una etiqueta por pallet para validar número de serie y niveles del código de barras.",
+ ["Validación solo en la recepción","Validación solo en el picking","Validación en ambos","Validación en RFCH; si la etiqueta falta o es inválida, abre el login de supervisor","Sin validación"],
+ "La validación solo ocurre en <b>líneas tipo P</b>, cuando se recibió la cantidad total y todos los process values fueron capturados. Etiqueta ausente o inválida impide cerrar la recepción (RFCH) o el pedido (RFPIC). En modo supervisor, este elige por cuánto tiempo apagar la validación: solo ese pallet, todos los pallets de la recepción, o todos los pallets de ese artículo en la recepción.");
+t("rfchs|Advance Receipt Header When Last Line Confirmed","Confirma automáticamente el encabezado de la recepción al confirmar la última línea.",
+ ["(por defecto) El encabezado se confirma junto con la última línea","El encabezado no se confirma automáticamente"],
+ "La opción <b>No existe para permitir agregar nuevas líneas después</b> de que todas las líneas de la recepción ya fueron confirmadas.");
+t("rfchs|Maximum Quantity Allowed in RFCH/RFPU","Techo de cantidad para cualquier línea de recepción en el terminal.",
+ ["Techo definido por usted","Techo por defecto de 9999"]);
+t("rfchs|Put Away Partial Pallet to Reserved Area","Reglas de almacenamiento de pallet parcial en área reservada.",
+ ["Desactivado — valen las reglas normales de almacenamiento en área no reservada","Activado, con la lógica de clasificación descrita abajo","Misma lógica que Yes, pero cantidad por encima del quiebre estándar NO genera mensaje y el almacenamiento sigue normal"],
+ "<b>Lógica del Yes:</b> cantidad recibida cero o nula \u2192 interrumpe y envía «SEE SUPERVISOR» \u00b7 igual al quiebre estándar \u2192 pallet completo \u00b7 menor que el quiebre estándar \u2192 pallet parcial \u00b7 mayor que el quiebre estándar \u2192 interrumpe y envía «SEE SUPERVISOR».");
+t("rfchs|Receipt Confirmation Date in RFCH/RFPU","Qué fecha se graba como fecha de confirmación de la recepción.",
+ ["La fecha de creación de la recepción","La fecha de confirmación de la recepción en CHRF"],
+ "Campo con efecto directo en facturación y en reportes de productividad por fecha. Conviene revisarlo antes del cierre de mes.");
+
+/* ---------- RFPU ---------- */
+t("rfpu|Validation Rules for Put-Away to Pick Line","Qué pasa cuando el operador intenta almacenar producto en una pick line no configurada para él.",
+ ["El operador no puede almacenar en una pick line que no está configurada para el producto en PIIT","Reservado para uso futuro","El operador almacena en cualquier pick line sin restricción"]);
+t("rfpu|Allow Put-Away to Staging Location","Habilita el almacenamiento en tres etapas (primero a un staging).",
+ ["El operador puede almacenar en una ubicación de staging","No es posible almacenar en staging desde RFPU"],
+ "Con Yes, mientras el producto esté en staging el flujo de la recepción <b>permanece en STPU (Start Put-Away)</b> y solo avanza a PUCO (Put-Away Complete) cuando finalmente se informe una ubicación no-staging.");
+t("rfpu|Variance Handling","Despliegue y aprobación de la pantalla de variación en el almacenamiento.",
+ ["La pantalla no aparece para nadie","Aparece para todos y no requiere supervisor","Aparece para todos y requiere supervisor","Aparece solo para supervisores, sin override adicional"],
+ "Como en RFCH, <b>la variación siempre queda registrada en LORE</b> aunque la pantalla no se muestre.");
+t("rfpu|Validation Rules for System-Assigned Locations","Si el operador debe volver a escanear la ubicación asignada por el sistema.",
+ ["Basta Enter para aceptar la ubicación sugerida","El operador debe redigitar/escanear la ubicación para confirmarla","La confirmación solo se exige cuando la ubicación tiene tipo LOTP con <code>Directed Put-Away = Yes</code>"]);
+t("rfpu|Event-Driven Cycle Count Profile (CYCP)","Perfil de conteo cíclico disparado por evento en el almacenamiento.",
+ ["Dispara conteo cíclico por evento según el perfil","Sin conteo por evento"],
+ "Detalle en el <b>Cycle Counting Guide</b> (manual B).");
+t("rfpu|Allow Quantity to be Updated","Si el operador puede cambiar la cantidad de la línea en el almacenamiento.",
+ ["Puede informar o modificar la cantidad","El cursor salta el campo Qty y la cantidad no puede cambiarse"]);
+t("rfpu|Enter/Change Hold Code","Nivel de acceso del operador al campo de hold en RFPU.",
+ ["Puede crear nuevos holds y cambiar los existentes","Puede crear nuevos, no puede cambiar los existentes","Sin ningún acceso al campo de hold en RFPU"]);
+t("rfpu|Maximum Number of F3 (NX) Allowed Per ILOP Sequence","Cuántas veces el operador puede pedir la siguiente ubicación sugerida.",
+ ["Límite de veces que puede presionarse F3 (NX) para mostrar otra sugerencia de almacenamiento"],
+ "Control antifraude clásico: sin límite, el operador puede saltar sugerencias hasta llegar a la ubicación que prefiere.");
+t("rfpu|Allow Put-Away of Multiple Pallets in RFPU","Almacena varios pallets leyendo varias UIs e informando el destino una sola vez.",
+ ["Almacenamiento múltiple habilitado","Un pallet a la vez"],
+ "Las mismas cinco restricciones de RFCH (mismo nivel 1, equipment tracking en COMP, <code>Location Required</code> en MHET, sin holds mezclados, dentro de la capacidad del equipo). <b>* No soporta directed put-away</b> — solo los flujos INST y STPU pueden tener <code>Assign Location = Yes</code>.");
+t("rfpu|Allow Receiving of Multiple Lines Together","Almacena varias líneas de recepción en un solo paso.",
+ ["Habilitado, cumplidas las cuatro condiciones","Una línea a la vez"],
+ "<b>Cuatro condiciones:</b> todas las líneas tienen la misma UI; están en la misma ubicación con el mismo hold code (si lo hay); todos los artículos tienen tres o cuatro niveles de inventario; y la cantidad digitada es la total, en el menor SKU. Si Directed Move Inbound asignó ubicaciones y el pallet tiene artículos mezclados, el <b>ILOP del artículo con mayor cantidad en el pallet</b> es el que define la ubicación destino.");
+t("rfpu|Change of Warehouse Rules","Si el operador puede cambiar el código de almacén y si eso requiere confirmación.",
+ ["El operador confirma el cambio de almacén","Cambia sin confirmación","No puede cambiar de almacén"]);
+t("rfpu|Confirm Receipt Line for Opportunistic Cross-Dock in RFPU","Confirmación automática de la línea almacenada en ubicación de cross-dock.",
+ ["La línea se confirma automáticamente al cerrar el almacenamiento","La línea debe confirmarse manualmente en CHRF"]);
+</script>
+<script>
+/* ---------- RFPIC ---------- */
+t("pic1|Default Mode","Modo de picking por defecto y qué puede o no elegir el operador en el terminal.",
+ ["El operador no puede seleccionar pallet ni normal mode (NM)","El operador no puede seleccionar case pick (CP) — excepto cuando pickea desde pick line","El operador confirma pallet o normal mode (NM) por defecto","El operador confirma case pick por defecto"],
+ "Una vez elegido el modo en RFPIC, <b>vale para todos los pedidos</b> hasta que el operador salga del programa o cambie con F2. <b>Pickear desde pick line fuerza automáticamente Case Picking</b>, sea cual sea la configuración. Este campo puede ser sobrescrito por combinación cliente/transportista/consignatario en <b>CCCC</b>.");
+t("pic1|Allow Loading Before Completion of Picking Process","Permite iniciar la carga antes de terminar el picking del pedido.",
+ ["El operador puede empezar a cargar en OLOP antes de pickear todo","Todo el producto del pedido debe pickearse antes de la carga"]);
+t("pic1|Duplicate Pallet Label Rules","Cómo trata el sistema los IDs de pallet duplicados en el picking.",
+ ["Duplicados permitidos sin restricción","Duplicados nunca permitidos","El operador acepta o rechaza el duplicado, en todos los pedidos","Duplicados prohibidos en pedidos abiertos","El operador decide, solo en pedidos abiertos","Duplicados solo dentro del propio pedido"]);
+t("pic1|Allow Partial Picking in Normal Mode","Qué líneas de pedido aparecen en la pick list de RFPIC en normal mode.",
+ ["Todas las líneas aparecen, sin importar la cantidad","Solo pallets completos y parciales que representen el último saldo de la ubicación","Solo pallets completos — para líneas parciales el operador debe cambiar a case pick","Solo pallets completos generados por el Wave Manager"],
+ "Definición usada por el sistema: <b>cantidad parcial = 60% o más del total de la ubicación</b>. Ejemplo: con 50 cajas en la ubicación y necesidad de pickear 30, es posible escanear las 20 que quedan en vez de las 30 que salen — el objetivo es reducir lecturas. Este campo también puede sobrescribirse en <b>CCCC</b>.");
+t("pic1|Assign PID on Full Pallets or Last Inventory","Cuándo se graba el pallet ID en el Process Block del pedido bajo el código CP.",
+ ["Se graba al pickear pallet completo o la última entidad de la ubicación en normal mode","Nunca se graba","Se graba después del primer pick en case pick mode","Se graba al pickear pallets completos por el quiebre estándar del artículo, en case pick mode en RFPIC"],
+ "La opción 4 es la única que menciona explícitamente <b>RFITLV</b> — relevante en ambiente de tasking.");
+t("pic1|Number of Days for Label Validation","Valida la fecha embebida en el código de barras de la caja contra la fecha del pedido.",
+ ["Si el valor es menor que (fecha de llegada del pedido \u2212 fecha del código de barras), aparece «Too old for order» y la caja no puede pickearse","Habilita el comportamiento de escanear las cajas que SALEN del pallet completo en vez de las que se pickean, en cantidad parcial"],
+ "<b>La opción mayor que cero requiere etiqueta personalizada.</b> Note que el valor cero no es solo «apagado» — habilita otro comportamiento de lectura.");
+t("pic1|Allow Suspended Holds","Qué pasa con el saldo no pickeado de una línea: split, hold suspendido y reasignación.",
+ ["La línea se divide, no se aplica hold suspendido y la nueva línea puede pickearse en cualquier momento. El comando F3 (HD) queda inhabilitado","Operadores no supervisores pueden poner producto en hold suspendido","Hold suspendido solo con aprobación de supervisor (comando HD) — y el pick parcial también requiere aprobación","Los no supervisores pueden poner en hold suspendido","Hold suspendido solo con aprobación — pero el pick parcial NO requiere aprobación"],
+ "En las dos primeras opciones de hold suspendido la línea se divide en dos: línea 1 con la cantidad pickeada, línea 2 con el saldo — <b>la línea 2 va a hold suspendido y el sistema intenta reasignarla</b>. En las dos opciones «Split Order Line…», la línea 2 NO recibe hold suspendido y NO hay intento de reasignación. Este campo <b>puede sobrescribirse por artículo en MIRP</b>.");
+t("pic1|Disallow Process Value Scanning","Si los process values pueden leerse dentro de RFPIC o solo en RFOPS.",
+ ["El operador NO puede escanear process values en RFPIC — debe hacerlo en RFOPS","Puede escanear en cualquiera de los dos programas"],
+ "En la versión <b>6.2</b> este campo aparece desdoblado (ej.: «Disallow Process Value Scanning RFCH/RFPU»), variante no presente en la documentación 4.2. Delta de versión a validar en el ambiente.");
+t("pic1|Allow Picking Outside Pick Line","Permite pickear producto de pick line desde una ubicación de bulk o rack.",
+ ["Picking fuera de la pick line activado","No permitido"],
+ "Existe para evitar congestión en la pick line cuando se generan varios reabastecimientos para el mismo producto. Ejemplo del manual: pedido de 10 cajas, 5 en la pick line, reabastecimiento de 60 cajas — el operador pickea las 10 del bulk y <b>esas 10 se restan del reabastecimiento</b> (60 \u2212 10 = 50). Disponible cuando la cantidad total no está en la pick line y ya existe reabastecimiento generado.");
+t("pic1|Replenishment Rules for Pick Line","Dónde se ejecuta el reabastecimiento de la pick line.",
+ ["El operador ejecuta reabastecimientos dentro del propio RFPIC","(por defecto) Reabastecimiento solo en RFRP o RFPL","En cada login el operador elige el modo de reabastecimiento"]);
+t("pic1|Display Original Order Number/Quantity for Consolidated Picks","Muestra el pedido y la cantidad originales cuando el pick es consolidado.",
+ ["No muestra","Muestra pedido, cantidad y SKU originales en un pop-up después de que el operador informa la UI"],
+ "Solo aplica a picking consolidado, tras consolidar los pedidos en <b>COPI</b>.");
+t("pic1|Display Pallet Screen","Cuándo aparece el Pallet Block en RFPIC.",
+ ["El bloque no aparece y el operador no puede expedir, recibir ni intercambiar pallets en el programa","Aparece antes del picking","Aparece después del picking","Aparece después de la cartonización manual en RFSC"]);
+
+/* ---------- RFPIC (2) ---------- */
+t("pic2|Activate Inventory Count","Con qué frecuencia el operador debe contar la ubicación durante el picking (count back).",
+ ["Conteo obligatorio en cada ubicación de pick","Conteo desactivado en RFPIC","Conteo solo cuando el saldo llega o baja del límite definido","Conteo cada N picks"]);
+t("pic2|Inventory Count Rules","Qué hacer cuando el conteo informado no coincide con el saldo del sistema.",
+ ["Ningún registro en ICIN y el operador pickea normalmente","El pick queda trabado hasta que un supervisor acepte o rechace la diferencia — <b>acepta: ningún ICIN; rechaza: crea ICIN</b>","Reservado para uso futuro","Reservado para uso futuro"],
+ "Solo disponible si <code>Activate Inventory Count</code> es distinto de Never.");
+t("pic2|Threshold Quantity to Initiate Count","Saldo a partir del cual se dispara el conteo.",
+ ["Límite para iniciar el conteo"],
+ "Solo disponible si <code>Activate Inventory Count</code> = «If Quantity Reaches or Falls Below Threshold Quantity».");
+t("pic2|Automatically Assign Pallet ID","Generación automática del pallet ID en case pick mode.",
+ ["El sistema genera un pallet ID único y el cursor avanza solo al campo Printer; el operador NO puede cambiarlo","El operador elige: Enter para que el sistema genere, o digitar/escanear un ID externo","El ID generado es un número de secuencia SSCC-18 válido"],
+ "<b>La opción Yes requiere documento de etiqueta</b> en <code>Label Document</code> o en <code>Quick Response Label Document</code>. Si todos los consignatarios usan quick response, el Label Document no es necesario; si hay mezcla, ambos campos deben completarse.");
+t("pic2|Label Document","Documento de etiqueta usado en el case pick.",
+ ["El campo Label en RFPIC viene con ese documento"],
+ "Solo disponible si <code>Automatically Assign Pallet ID = Yes</code>. Si hay registro de detalle en DOCU indicando impresora y operador, <b>el campo Printer en RFPIC también viene completado</b> con la impresora del operador.");
+t("pic2|Quick Response Label Document","Documento de etiqueta quick response usado en el case pick.",
+ ["El campo Label en RFPIC viene con el número quick response"],
+ "Solo disponible si <code>Automatically Assign Pallet ID = Yes</code>. Misma regla de completado automático de la impresora vía registro de detalle en DOCU.");
+t("pic2|Sort Sequence Code (SOSE)","Ordenamiento (snaking) de la pick list de tareas de RFPIC.",
+ ["La pick list se ordena por el SQL del sort sequence","La pick list sigue el orden de código de ubicación"],
+ "Comportamiento crítico: con sort sequence activo, <b>el operador elige libremente el primer artículo/ubicación/entidad de la lista, pero después queda obligado a terminar ese agrupamiento antes de pasar al siguiente</b>. Ejemplo: con sort por artículo y tres artículos en el pedido, al elegir el artículo B debe pickear todas las líneas del artículo B primero. El SQL debe contener el nombre de la tabla — <code>c_invt</code>, <code>e_ord_d5d1</code> o <code>m_loc</code>.");
+t("pic2|Sort Sequence Based on","Sobre qué valor se aplica el ordenamiento del SOSE.",
+ ["Ordena y agrupa por artículo","Por ubicación","Por entidad de inventario"]);
+t("pic2|Event-Driven Cycle Count Profile (CYCP)","Perfil de conteo cíclico disparado por evento durante el picking.",
+ ["Dispara conteo cíclico por evento","Sin conteo por evento"],
+ "Detalle en el <b>Cycle Counting Guide</b> (manual B).");
+t("pic2|Enter Outbound Pallet ID Before Picking","Si los parámetros de la etiqueta se informan antes o después del pick.",
+ ["El operador informa los parámetros de etiqueta DESPUÉS de pickear las líneas","Los informa ANTES de pickear"],
+ "Disponible <b>solo para case pick mode en RFPIC/RFITLV</b>.");
+t("pic2|Generation of Outbound Pallet ID Label","Cómo se genera, imprime y valida el OPID.",
+ ["No se imprime etiqueta y el campo PRT se salta","Enter en el campo L(abel) genera el OPID; el operador lo escanea para validarlo","Enter genera el OPID, sin escaneo de validación","El operador digita o escanea un OPID externo","El operador digita o escanea el OPID externo DOS veces","El operador informa un OPID externo; tras imprimir, escanea la etiqueta para verificar que coincida con el original","Opción personalizada"]);
+t("pic2|Extra Charge Entry Type","Momento en que aparece la pantalla de cargos extra en el picking.",
+ ["La pantalla aparece al terminar de pickear la línea del pedido","La pantalla aparece al salir de RFPIC"],
+ "Como en inbound, solo vale para cargos extra <b>por cliente</b> configurados en ECHP.");
+
+/* ---------- RFPIC (3) ---------- */
+t("pic3|Display Rules for Location/UI/Quantity","Elimina digitaciones y validaciones para acelerar el picking.",
+ ["Muestra ubicación/UI al pickear desde pick line","Muestra para todas las ubicaciones","Muestra y salta ubicación/cantidad en normal mode","Muestra y salta la UI en ubicación no-reserva","Muestra y salta la UI al pickear desde pick line","Salta la ubicación de origen, va directo a la UI y muestra la cantidad de línea saltando el campo Qty"],
+ "Cada «bypass» gana velocidad y <b>pierde un punto de control</b>. Conviene mapear qué deja de validar cada opción antes de elegir.");
+t("pic3|Separate Hazmat by Item in Each Pick","Aplica las reglas de segregación de producto peligroso en el picking y en el merge.",
+ ["Las reglas de segregación de IHZV valen en RFPIC y RFMG","Las reglas de IHZV se ignoran en esos dos programas"],
+ "Es este flag el que <b>enciende</b> IHZV. Con las reglas violadas, el operador no puede pickear la línea ni hacer el merge del OPID.");
+t("pic3|Warehouse/Location for Kit Lines","Almacén y ubicación para líneas de kit.",["Reservado para uso futuro"]);
+t("pic3|Rules for Picking by Item/UPC","Validación del código UPC leído por el operador contra el maestro de artículos alternativos.",
+ ["Valida en todas las ubicaciones","Valida solo en ubicaciones de pick line","Sin validación de los niveles 2/3/4 de ALIT"],
+ "El UPC leído se compara con el UPC registrado en ALIT: si los niveles de inventario ligados al UPC coinciden con los de la línea del pedido, el pick se acepta; si no coinciden, se rechaza. En la opción 3, para <b>cuentas de un solo nivel</b>, el operador puede leer tanto el código del artículo (nivel 1) como el UPC.");
+t("pic3|Capture OPID Cube and Dimension","Captura de dimensiones cúbicas y peso bruto por caja/pallet.",
+ ["Captura en RFPIC — dimensiones en metros y peso bruto en kilos","Captura en RFSC","Captura desactivada en ambos programas"],
+ "<b>Solo para uso personalizado.</b>");
+t("pic3|Disable Last Label Scan in RFPK","Deshabilita la lectura de la última etiqueta en el wave pick.",["Reservado para uso futuro"]);
+t("pic3|Use Bookmark in Picklist","Marca la posición en la pick list para que el operador continúe donde quedó.",
+ ["La primera línea elegida queda marcada; al volver a la lista, abre en la línea SIGUIENTE al marcador","La lista siempre reabre en la primera línea"],
+ "<b>La opción Yes no está disponible si el campo <code>Sort Sequence Code (SOSE)</code> está completado</b> — bookmark y sort sequence son mutuamente excluyentes.");
+t("pic3|Allow Case Pick While in CART Mode in RFPK","Activa el pick method 7 (Less Than Full Pallet) en el wave pick.",
+ ["Pick method 7 activado en RFPK","No disponible"]);
+t("pic3|Allow Reusable Cartons in RFPK","Cajas reutilizables en el wave pick.",["Reservado para uso futuro"]);
+t("pic3|Supervisor Override Required for BATP in RFPK","Cuándo el wave pick en batch label mode requiere override de supervisor.",
+ ["Solo cuando el operador reduce la cantidad del pedido","Solo cuando el operador declara faltante (short)","En ambos casos","Ningún override — el operador reduce y declara faltante libremente"],
+ "Diferencia entre ambos casos (ejemplos del manual): <b>reducir cantidad</b> = pedido de 10 unidades, hay 10 en la ubicación y el operador pickea 5. <b>Short</b> = pedido de 10, hay 10 en la ubicación pero 5 están dañadas, el operador pickea 5 y declara faltante las otras 5.");
+t("pic3|Automatically Confirm Order After Last Pick","Confirmación automática del pedido al pickear la última línea.",
+ ["El pedido se confirma automáticamente","El pedido debe confirmarse manualmente en CHOF"],
+ "<b>La opción Yes no admite ningún flujo entre FIPI (Finish Picking) y COOR (Confirm Order).</b> Si la operación tiene etapas intermedias — auditoría, packing, staging con flujo propio — este campo debe quedar en No.");
+t("pic3|Enter Pallet Type","Exige que el operador informe un tipo de pallet válido en el picking.",
+ ["El operador debe informar un tipo de pallet definido en PALL","No se solicita"],
+ "Si hay un código de pallet definido para el consignatario en el campo <code>Pallet Code</code> de CONS, <b>RFPIC valida que el pallet informado coincida con el del consignatario</b>.");
+
+/* ---------- RFPIC (4) ---------- */
+t("pic4|Allow Relocation if Allocated Product Blocked","Abre RFRL cuando el operador lee una UI que está en la ubicación correcta pero no es la asignada.",
+ ["RFRL se muestra siempre que el operador informa una «UI inválida»","Aparece mensaje de error y RFRL no queda disponible"],
+ "Existe para resolver el caso del producto que está <b>físicamente adelante</b> bloqueando el producto asignado al pedido — el operador saca el obstáculo sin salir del flujo.");
+t("pic4|Display and Pick SKU","Qué SKU se muestra y qué SKU informa el operador al pickear.",
+ ["Muestra y pickea siempre en el menor SKU, aunque difiera del SKU de ENOR","Muestra el SKU de la línea de ENOR, pero el operador informa en el menor SKU"]);
+t("pic4|Allow Pick of Multiple OPID’s in RFPIC","Lleva varios OPIDs al staging en un solo paso.",
+ ["Múltiples OPIDs por movimiento, respetando las restricciones","Ídem, incluyendo pedidos COPI no consolidados solo con pallet completo en normal mode","Un OPID por pick"],
+ "Las mismas cinco restricciones de los movimientos múltiples: mismo nivel 1, equipment tracking en COMP, <code>Location Required</code> en MHET, sin holds mezclados y dentro de la capacidad del equipo.");
+t("pic4|Display Rules for Default Staging Location","Cómo se muestra el staging por defecto y si necesita escanearse.",
+ ["Repite el staging del pick anterior, sin escaneo","Muestra el último staging del pedido y exige escaneo","Muestra staging del pedido y de la carga, con escaneo","Muestra el último staging del pedido, sin escaneo","No muestra staging en normal mode"]);
+t("pic4|Picking Methods for PnD Location","Modos de picking permitidos en ubicaciones P&D.",["Solo pallet completo","Todos los modos"]);
+t("pic4|Display Order of Items and Descriptions in Pick List","Orden en que aparecen artículo y descripción en la pick list.",
+ ["Código del artículo primero","Descripción primero"]);
+t("pic4|Display Pick Quantity in Higher UOM","Muestra la cantidad a pickear en la mayor unidad de medida.",
+ ["La cantidad aparece en el mayor SKU (normalmente PLT)","Mantiene la unidad estándar"]);
+t("pic4|Validate OPID Using MSVS Code","Validación personalizada de OPID vía special verifier SQL.",
+ ["Ejecuta la validación personalizada definida en MSVS","Sin validación personalizada"],
+ "Este es uno de los puntos de entrada de <b>personalización por MSVS</b> en el flujo de picking — solo debe usarse tras agotar las opciones nativas.");
+t("pic4|Capture Pallet Spots","Captura de posiciones de pallet.",["Solo para uso personalizado"]);
+t("pic4|Scan From Location in RFPIC","Si la ubicación de origen debe escanearse en cada pick.",
+ ["El campo From Location lo completa el sistema, sin escaneo","La ubicación de origen debe escanearse en cada pick"]);
+t("pic4|Apply Mask to UI in RFPIC","Enmascara caracteres de la UI para impedir la digitación en lugar de la lectura.",
+ ["Enmascara de 1 a 25 caracteres desde la izquierda","Enmascara de 1 a 25 caracteres desde la derecha"],
+ "Control antifraude explícito en el manual: existe para <b>impedir que el operador digite la UI en vez de escanearla</b>.");
+t("pic4|Inventory Count Investigation Type","Alcance de los registros ICIN generados por diferencia en el count back.",
+ ["Genera ICIN para TODO el inventario on order del almacén cuyos niveles coincidan con los del pallet pickeado con variación","Genera ICIN solo para el pallet actual con variación — los demás pallets de pedidos no confirmados con el mismo inventario no reciben ICIN"],
+ "Cuando el supervisor entra a investigar: <b>Y (Resolved)</b> \u2192 ningún ICIN para el pallet actual, pero sí se crea ICIN para todos los demás pallets de pedidos abiertos cuyos tres primeros niveles coincidan. Al elegir Resolved confirma la cantidad: si coincide con el sistema, ningún ICIN; si la cantidad informada es MENOR, la diferencia va a hold <code>SUSP</code> y se generan los ICIN; si es MAYOR, aparece «Move excess to designated location with label» y se generan los ICIN. <b>N (Not Resolved)</b> \u2192 ningún ICIN y se indica al operador repetir el pick de la línea.");
+
+/* ---------- RFPIC (5) ---------- */
+t("pic5|Inventory Count Display Type","Dispensa el conteo cuando entrada, salida y maestro coinciden entre sí.",
+ ["No se exige conteo cuando el quiebre estándar del artículo es igual a la cantidad de entrada y a la de salida — es decir, se recibió un pallet completo y sale entero"],
+ "Para producto de <b>variable quantity breakdown</b>, el conteo se dispensa cuando el quiebre de salida coincide con el de entrada.");
+t("pic5|Use Tie/Hi/Loose to Calculate Inventory Count Quantity","Forma en que el operador informa el conteo de retorno.",
+ ["El operador digita la cantidad total del producto en la ubicación","El operador informa tie, hi y loose y el sistema calcula el total"]);
+t("pic5|Inventory Count for Pallet Pick in RFITLV","Count back en picking de pallet completo dentro del tasking.",
+ ["Count backs desactivados para picks de pallet completo en RFITLV","Los count backs siguen las reglas normales también en pallet completo"],
+ "Uno de los <b>dos únicos campos de MRFP dedicados a RFITLV</b>. En operación de tasking con alto volumen de pallet completo, el No suele ser lo que hace viable el ritmo.");
+t("pic5|Pick Mode in RFITLV","Si el operador elige la tarea o recibe una a la vez.",
+ ["Se muestra la pick list normal y el operador elige en qué tarea trabajar","El operador ve UNA tarea a la vez, no puede seleccionar de la lista ni saltarla"],
+ "<b>Este es el campo que convierte el orden sugerido por el task engine en orden obligatorio.</b> Con «Use Pick List» la discrecionalidad vuelve al operador y buena parte de la ganancia del tasking se pierde.");
+t("pic5|Validate Item and Other Levels Special Mode","Extracción de cantidad del código de barras GS1 y validación de los niveles 1/2.",
+ ["Extrae la cantidad del código GS1 y valida niveles 1/2 contra el código leído","La validación de los niveles 1/2 ocurre DESPUÉS de que el operador informa la ubicación destino"],
+ "En la opción 1, si la cantidad es <b>digitada en vez de leída</b> y no coincide con la cantidad de la línea del pedido, aparece mensaje de error y <b>se requiere aprobación de supervisor</b> para cerrar el pick.");
+t("pic5|Pick Background Substitution Rules","Reglas de sustitución en background en el picking.",["Reservado para uso futuro"]);
+t("pic5|Location Validation in RFPK - CART Pick","Exige lectura de la ubicación en el wave pick en modo carro.",
+ ["La lectura de la ubicación NO se exige en cart pick","La lectura de la ubicación se exige en cart pick"]);
+t("pic5|Override System-Assigned OPID","Si el operador puede sobrescribir el OPID asignado por el sistema.",
+ ["Puede sobrescribirlo digitando o escaneando encima","El campo OPID queda protegido","Aparece el aviso «OPID has been changed. Y = Continue. No = Reverse the Value» — Y acepta el cambio, No lo cancela y devuelve el OPID original"]);
+</script>
+<script>
+/* ---------- MISCELLANEOUS ---------- */
+t("misc1|Display Order Lines by Item/Location in RFPI","Ordenamiento de las líneas de pedido en RFPI.",
+ ["Líneas ordenadas por código de artículo","Líneas ordenadas por código de ubicación"]);
+t("misc1|Picklist Rules in RF Relocate","Si la ubicación de origen viene de pick list, exige escaneo, o ambos.",
+ ["El operador elige en la pick list Y escanea el origen para validar","(por defecto) Elige en la pick list, sin escaneo","Sin pick list — el origen debe escanearse"]);
+t("misc1|Validation Rules for Relocate to Pick Line","Qué pasa al reubicar hacia una pick line no configurada para el producto.",
+ ["Bloquea la reubicación hacia una pick line no configurada en PIIT","Muestra aviso, pero el operador puede ignorarlo presionando F3 para procesar","Sin restricción alguna"]);
+t("misc1|Validate Level Number in Physical","Validación de número de nivel en el inventario físico.",
+ ["Campo opcional"],
+ "Detalle en el <b>Physical Inventory Guide</b> (manual F).");
+t("misc1|Validate Quantity in Order Move","Si el operador informa la cantidad al mover producto en RFST.",
+ ["El operador informa la cantidad movida — el número de cajas/unidades asignado a un OPID en RFPIC","La cantidad no se informa"]);
+t("misc1|Validate From Location in Order Move","Si la ubicación de origen es exigida en RFST.",
+ ["El operador informa la ubicación de origen","El origen no se exige"]);
+t("misc1|Location Type of To Location in Order Move","Qué tipo de ubicación puede usarse como destino en RFST.",
+ ["Cualquier ubicación","Solo staging","Solo pick","Staging, excepto ubicaciones de puerta"]);
+t("misc1|Allow Directed Move in RF Relocate","Permite que el sistema elija la mejor ubicación destino en la reubicación.",
+ ["El sistema selecciona la mejor ubicación destino según los parámetros de directed move de ILOP","El operador elige manualmente"]);
+t("misc1|Display From Relocation Quantity in RF Relocate","Muestra la cantidad de la ubicación de origen ya en el campo QTY.",
+ ["La cantidad aparece en el campo QTY y el cursor va a LOC TO; el operador reubica todo o presiona F9 para cambiarla","La cantidad no se muestra"],
+ "La cantidad se muestra en formato «cooked» — <b>1 pallet/25 cajas</b> en vez de 125 cajas. Deben cumplirse dos condiciones: todo el producto de la ubicación pertenece a la misma entidad de inventario; y la cantidad contiene más de un tipo de SKU. Pensado para operaciones donde reubicar todo es la regla, no la excepción.");
+t("misc1|Allow RFCY Supervisor Count","Conteo de supervisor en RFCY.",["Reservado para uso futuro"]);
+t("misc1|Print Inventory Access/REPI Quantity Label","Impresión de etiqueta de cantidad de reabastecimiento.",["Reservado para uso futuro"]);
+t("misc1|Document Code for Quantity Labels","Documento usado en las etiquetas de reabastecimiento.",
+ ["Documento de las etiquetas de reabastecimiento"],"<b>Requiere documento personalizado.</b>");
+
+/* ---------- MISCELLANEOUS (2) ---------- */
+t("misc2|Use Pick Ticket Instead of RF Pick","Retira de RFPK las líneas con pick method CART o EACH.",
+ ["Los operadores en RFPK NO acceden a líneas con pick method CART o EACH — esas líneas se pickean manualmente fuera de RFPK","Acceso total a todas las líneas, sea cual sea el pick method"]);
+t("misc2|Rules for Uniqueness of Serial Number","Cómo verifica el sistema números de serie duplicados en la captura de process values.",
+ ["Ningún número de serie duplicado dentro de la misma recepción/pedido","Ningún duplicado para el mismo artículo en una misma recepción/pedido","Ningún duplicado dentro de la misma entidad de inventario en una misma recepción/pedido","Duplicados permitidos sin restricción"],
+ "Violada la regla, <b>el operador no puede continuar</b>.");
+t("misc2|Allow Merging Orders/Items to One OPID Within Load (RFMG)","Permite consolidar pedidos/artículos en un único OPID dentro de la misma carga.",
+ ["Ver la sección de merge de OPIDs en RFMG"]);
+t("misc2|Allow Merging Up To Level (RFMG)","Hasta qué nivel de inventario el merge puede mezclar entidades.",
+ ["Merge hasta el nivel 1","Merge hasta el nivel 2","Merge hasta el nivel 3"],
+ "Ejemplo del manual: con Level 1, al unir dos pallets con lotes y pallet IDs distintos, <b>el lote y el pallet ID ajustados hacia afuera se pierden</b> y la cantidad del lote/pallet ID ajustado hacia adentro se corrige. Decisión con impacto directo en trazabilidad.");
+t("misc2|Refresh Screen After Each Relocation (RFRL)","Limpia la pantalla de RFRL después de cada reubicación.",
+ ["Se muestra una pantalla en blanco tras cada reubicación","La pantalla no se limpia"]);
+t("misc2|Confirm OPID for Pick Method in RFCO","Si las líneas con pick method CART pueden confirmar el OPID en el terminal.",
+ ["Las líneas con pick method CART pueden confirmar el OPID en RFCO","Las líneas CART solo pueden confirmarse en CHOF"]);
+t("misc2|RF Relocation Executed by","Qué lectura dispara la ejecución de la reubicación.",
+ ["La lectura de la ubicación de origen ejecuta la reubicación — F3 (Process) no es necesario","La lectura de la UI ejecuta la reubicación","Se exigen ambas lecturas"]);
+t("misc2|Allow Mixed Pallet","Reubicación de pallet mixto en una sola acción.",
+ ["Permite reubicar pallet mixto (varios artículos, lotes, date codes) de una vez","No permitido"],
+ "La reubicación por licencia de pallet <b>mueve todos los registros de inventario asociados al pallet</b>.");
+t("misc2|Show RF Confirm OPID Summary","Resumen del pedido por OPID en la confirmación.",
+ ["Muestra un pop-up con el resumen del pedido para cada OPID — pick method y total de unidades","Sin resumen"]);
+t("misc2|Create RF Confirm OPID Audit","Registro de auditoría de la confirmación de OPID.",
+ ["Inserta un mensaje con time-stamp en el Time Block de LOOR indicando que el OPID fue confirmado en RFCO","No se inserta ningún registro"]);
+t("misc2|RFOA Audit Level","Nivel de inventario usado en la auditoría de producto en staging antes de la carga.",
+ ["Conteo por artículo del pedido","Conteo por lote del pedido","Conteo en el nivel 3","Conteo en el nivel 4"]);
+t("misc2|RFOPS Sort Sequence Code (SOSE)","Ordenamiento de los process values en la captura outbound.",
+ ["Reordena la lista de process values","Orden natural"],
+ "Ejemplo del manual: una lista sin ordenar trae <b>carton ID, carton ID, carton ID, peso, peso, peso</b>; tras el sort, queda <b>carton ID, peso, carton ID, peso, carton ID, peso</b> — la secuencia lógica de trabajo.");
+
+/* ---------- MISCELLANEOUS (3) ---------- */
+t("misc3|Other Inventory Count Programs","En qué programas RF, además de RFPIC, se ejecuta el count back.",
+ ["Los programas elegidos pasan a exigir count back"]);
+t("misc3|Activate Inventory Count","Cuándo se dispara el count back en esos otros programas.",
+ ["Conteo en cada almacenamiento, reubicación o reabastecimiento","Desactivado","Solo cuando la cantidad baja hasta el límite definido"],
+ "<b>Qué ubicación se cuenta depende de la actividad:</b> en put-away se cuenta siempre la ubicación DESTINO; en reubicación y reabastecimiento se cuenta la ubicación de ORIGEN.");
+t("misc3|Inventory Count Rules","Qué hacer cuando el conteo no coincide con el saldo, en esos programas.",
+ ["Un supervisor debe entrar y aprobar la diferencia","Reservado para uso futuro","El operador sigue normalmente a la siguiente operación"]);
+t("misc3|Threshold Quantity to Initiate Count","Límite de cantidad que dispara el conteo.",
+ ["Límite para iniciar el count back"],
+ "Solo disponible si <code>Activate Inventory Count</code> (de esta pestaña) = «If Quantity Reaches or Falls Below Threshold Quantity».");
+t("misc3|Inventory Count for All RF Based On","Si el conteo es por artículo o por entidad de inventario.",
+ ["El operador cuenta cada artículo de la ubicación","Por artículo en las pick lines, por entidad en las demás","El operador cuenta cada entidad de inventario de la ubicación"],
+ "Elección con fuerte impacto en el tiempo de conteo: en una ubicación con muchas entidades del mismo artículo, contar por artículo es bastante más rápido — y menos preciso para trazabilidad.");
+t("misc3|Rules to Allow Short / Delete Line in RFIPS","Si las líneas de recepción pueden acortarse o borrarse en RFIPS.",
+ ["No permitido","Permitido"]);
+t("misc3|Suggested Location Rules in RFST","Qué ubicación se sugiere como destino en el movimiento de pedido.",
+ ["La sugerencia es la ubicación donde se dejó el último OPID — siempre el destino elegido en la línea anterior","La sugerencia es el staging asignado a la línea en SELO o en el Wave Manager, y NO cambia aunque el operador sobrescriba el destino sugerido"]);
+t("misc3|Display To-Location in RFST","Muestra u oculta la ubicación destino sugerida.",
+ ["La sugerencia se muestra","La sugerencia no se muestra"],
+ "La opción Yes solo está disponible si <code>Suggested Location Rules in RFST</code> está activo.");
+t("misc3|Default Staging Warehouse/Location Code in CASE","Almacén y staging por defecto en modo CASE.",["Solo para uso personalizado"]);
+t("misc3|Enter Adjustment Information","Exige código de ajuste, motivo y observaciones en cada ajuste de RF.",
+ ["El operador informa código de ajuste (ADJU), código de motivo (REAS) y observaciones en cada ajuste","No se solicita nada de eso"],
+ "Campo decisivo para la trazabilidad de ajustes y para el análisis posterior de causa raíz de diferencias.");
+t("misc3|Allow Relocation of Multiple Pallets in RFRL","Reubica varios pallets leyendo varias UIs e informando el destino una vez.",
+ ["Reubicación múltiple habilitada","Un pallet a la vez"],
+ "Las mismas cinco restricciones de los demás movimientos múltiples: mismo nivel 1, equipment tracking en COMP, <code>Location Required</code> en MHET, sin holds mezclados y dentro de la capacidad del equipo.");
+
+/* ---------- MISCELLANEOUS (4) ---------- */
+t("misc4|Allow Replenishment of Multiple Pallets in RFRP","Reabastece varios pallets en un solo paso.",
+ ["Reabastecimiento múltiple habilitado","Un pallet a la vez"],
+ "Las mismas cinco restricciones de los demás movimientos múltiples.");
+t("misc4|Allow Mixed Put-Away, Move up to Inventory Level","Hasta qué nivel de inventario los pallets mezclados pueden moverse juntos.",
+ ["Pallets con niveles 2, 3 y 4 distintos pueden ir juntos","Mezcla permitida hasta el nivel 2","Mezcla permitida hasta el nivel 3","El producto mixto no puede moverse en un solo paso"],
+ "Ejemplo del manual: con «Up to level 1», pallets de recepciones, citas y cargas de entrada <b>distintas</b> pueden ir en el mismo montacargas y almacenarse juntos. Este es uno de los pocos campos de MRFP que alcanza <b>seis programas a la vez</b>.");
+t("misc4|Reason Code Required to Override System-Assigned Location","Exige código de motivo cuando el operador sobrescribe la ubicación sugerida.",
+ ["Código de motivo obligatorio al sobrescribir la ubicación o pedir una alternativa","Sin código de motivo","Reservado para uso futuro"],
+ "<b>Solo para overrides en RFCH/RFPU</b> el código de motivo se graba en la línea de la recepción y se crea un time stamp. Es la contraparte investigativa de <code>Max. Number of F3 (NX)</code>: uno limita, este registra.");
+t("misc4|Max. Number of F3 (NX) Allowed Per ILOP Sequence in RFRL","Cuántas veces el operador puede pedir otra ubicación sugerida en la reubicación.",
+ ["Límite de veces que F3 (NX) muestra otra sugerencia de destino"]);
+t("misc4|Allow Multiple Pallet Moves in RFST","Mueve varios pallets en un solo paso en el movimiento de pedido.",
+ ["Movimiento múltiple habilitado","Un pallet a la vez"],
+ "Las mismas cinco restricciones de los demás movimientos múltiples.");
+t("misc4|Show Quantity Breakdown Screen","Muestra el quantity breakdown del artículo como pop-up en siete programas RF.",
+ ["El breakdown aparece como pop-up en RFPIC, RFPK, RFRL, RFPR, RFRP, RFCH y RFPU","No aparece"]);
+t("misc4|Allow Skipping of Inbound Serial Number Validation in RFOPS","Dispensa la validación del número de serie de entrada en la expedición.",
+ ["La validación puede saltarse y el sistema genera un nuevo número de serie de salida","La validación es obligatoria"],
+ "Existe para eliminar el escaneo de validación caja por caja. Flujo en el terminal: el operador elige <b>ME (Manual Entry)</b>, informa el peso y presiona <b>F1 (SE)</b> para generar el número de serie. Caso de uso citado: pedido de transferencia de producto serializado entre cuentas.");
+t("misc4|Allow Weight Reduction for Standard Weight Item in RFOPS","Reduce producto de peso estándar informando cantidad en vez de peso.",
+ ["El operador reduce informando una cantidad — ej.: 5CS — que debe ser menor o igual a la cantidad del pedido","No permitido"],
+ "Al presionar <b>F2 (RC)</b> el terminal muestra el prompt de confirmación.");
+t("misc4|Enter Gross Weight in RFSC","Exige peso bruto al cerrar la caja en la cartonización.",
+ ["El operador informa el peso bruto al cerrar la caja","No se solicita"],
+ "La unidad de medida de peso de la caja se define en <b>DITP</b> (Depositor Item Profile).");
+t("misc4|Allow Put-Back of Outstanding REPI Quantity","Qué hacer con el saldo cuando el reabastecimiento es parcial.",
+ ["Se crea un segundo reabastecimiento con el saldo para la pick line original","Se invita al operador a ejecutar el segundo reabastecimiento — en la pick line original o en otra","Si el saldo en la pick line es MAYOR que la cantidad on order, el segundo reabastecimiento se borra; si no lo es, se crea para la pick line original (igual que No)"],
+ "Escenario del manual: quiebre de 50 cajas/pallet, reabastecimiento de 45 cajas del bulk (producto bloqueado o dañado impidió el pallet completo), pedido de 10 cajas — el saldo pendiente es de 5 cajas.");
+t("misc4|Enable UI Scanning in Cycle Counts","Lectura de UI en el conteo cíclico.",["Solo para uso personalizado"]);
+t("misc4|Suspend Flow Advancement in Outbound Audit","Impide el avance de flujo aunque la auditoría cierre correcta.",
+ ["La línea del pedido NO avanza de flujo aunque el conteo coincida con la cantidad","La línea avanza cuando el conteo coincide"]);
+
+/* ---------- MISCELLANEOUS (5) ---------- */
+t("misc5|Retain OPID to in RFMG","Mantiene el OPID destino en pantalla después del merge.",
+ ["El valor de OPID destino permanece en pantalla para que el operador siga consolidando en el mismo OPID","El campo se limpia en cada merge"]);
+t("misc5|Validate Manual Entry Process in RFOPS","Validaciones aplicadas cuando el operador digita peso variable o número de serie en vez de escanear.",
+ ["Tres validaciones: el largo y el tipo de dato deben coincidir con el setup de IPRO; el peso/serie de SALIDA debe coincidir con el de ENTRADA; y, si el peso no coincide, debe estar dentro del porcentaje de tolerancia definido en ITEM","Solo el largo y el tipo de dato deben coincidir con IPRO"],
+ "<b>Es este campo — y no el flag Inbound/Outbound = B de IPRO — el que activa la comparación entrada vs. salida.</b> IPRO con B solo solicita la captura en ambas puntas. La comparación también requiere <code>Transfer Value to Inventory = Y</code> en IPRO. Punto abierto para validación empírica: el texto 4.2 habla de «manually entering», sin aclarar si el alcance cubre también valores escaneados.");
+t("misc5|Disallow REPI When Location Reaches Maximum Capacity","Cancela reabastecimientos que excederían la capacidad de la pick line.",
+ ["El reabastecimiento se cancela cuando cantidad a reabastecer + saldo en la pick line excede la capacidad de la ubicación","El reabastecimiento no se cancela"],
+ "<b>Dos salvedades:</b> el producto en hold <code>SUSP</code> no entra en el saldo de la pick line; y la opción Yes <b>se ignora</b> si hay override de shelf life en CCOP para el pedido que disparó el reabastecimiento.");
+t("misc5|Validate Serial Number (SN) From Picking Process","Reverificación del número de serie en el momento del packing.",
+ ["Validación activa en RFSC — debe leerse un número de serie válido para todo producto empacado","Validación desactivada en RFSC"],
+ "La finalidad del escaneo adicional es garantizar que <b>el número de serie leído en RFPIC sea el mismo que está entrando en la caja</b> durante el packing.");
+t("misc5|Display Minimum Number of REPI Records in Demand Mode","Muestra solo los reabastecimientos necesarios para atender el pedido.",
+ ["Solo aparecen los reabastecimientos necesarios para cubrir la cantidad del pedido; los que existen solo para alcanzar el mínimo de la ubicación no aparecen en modo demanda","Aparecen todos"],
+ "Ejemplo del manual: 255 cajas en la pick location, 305 on order. Existen tres reabastecimientos que suman 144 cajas, pero solo 60 son necesarias para el pedido — <b>solo aparece el reabastecimiento de 60</b> en demand mode.");
+t("misc5|Override Quantity Breakdown - Actual (if > Std) or Std","Elige entre el quiebre real del pallet y el quiebre estándar del artículo.",
+ ["Aplica las tres reglas descritas abajo en RFCH y RFMI","Comportamiento estándar"],
+ "<b>Reglas:</b> si la cantidad del pallet asociada a la UI es MENOR que el quiebre estándar del artículo, usa el quiebre estándar; si es MAYOR O IGUAL, usa el quiebre real; y, en quiebre pallet/caja/unidad, la configuración caja/unidad no cambia. <b>Atención:</b> el quiebre informado en RFCH sobrescribe el quiebre de ENRE y del EDI.");
+t("misc5|Display Process Description in RFOPS","Muestra la descripción del process code además del código.",
+ ["Muestra la descripción del item process code","Muestra solo el código, sin descripción"]);
+t("misc5|Allow Entry of Adjustment Code in RFMI","Si el operador informa el código de ajuste en el merge de inventario.",
+ ["El operador informa el código de ajuste del merge","Usa el código de ajuste por defecto configurado en ATMP (Action Template Setup)"]);
+t("misc5|REPI Pick Location Capacity Based on UI","Si la capacidad de la pick line se mide en UIs o en unidades.",
+ ["La capacidad se mide por la CANTIDAD DE UIs — con capacidad de dos pallets y dos UIs en la ubicación, se considera llena aunque las dos UIs sean pallets parciales","La capacidad se mide por la cantidad real de unidades"],
+ "Ubicación considerada llena = <b>ningún reabastecimiento ocurre</b>. Con Yes, dos pallets parciales traban el reabastecimiento; es una de las causas más comunes de pick line que no se reabastece.");
+</script>
+<script>
+const railEl=document.getElementById("rail"),mainEl=document.getElementById("main"),
+      qEl=document.getElementById("q"),cntEl=document.getElementById("count"),
+      progsEl=document.getElementById("progs"),hideResEl=document.getElementById("hideRes"),
+      clrEl=document.getElementById("clr"),langEl=document.querySelector(".lang");
+let active=TABS[0].id, prog=null, lang="pt";
+
+/* ---------- UI strings ---------- */
+const UI={
+ pt:{title:"RF Profile — Navegador de Campos",
+     intro:"Todos os campos do perfil de RF, aba por aba: o que cada um faz, quais valores aceita e em quais programas RF ele age. O MRFP define os valores default e as opções disponíveis nos programas RF principais e, depois de criado, precisa ser anexado ao(s) cliente(s) em CUST.",
+     src:"Fonte: H_RF_Guide_4_2_upd2_Classic.md · cap. GENERAL SETUP PROGRAMS · pp. 16–83",
+     mapH:"Mapa de impacto",
+     mapP:"Cada programa RF abaixo é tocado por N campos do MRFP. Clique para filtrar apenas os campos que afetam aquele programa.",
+     ph:"Buscar campo, valor ou comportamento…",
+     hide:"Ocultar campos reservados/custom", clear:"Limpar filtros",
+     one:" campo", many:" campos",
+     res:"Reservado para uso futuro", cust:"Customizado / hardware específico",
+     tab:"aba ", results:"Resultados",
+     resSub:"Campos de todas as 17 abas do MRFP que atendem ao filtro. Cada cartão indica a aba de origem.",
+     search:"busca", program:"programa",
+     empty:"Nenhum campo corresponde a esse filtro. Tente outro termo ou limpe os filtros.",
+     foot:c=>"MRFP · "+c+" campos mapeados em 17 abas · H_RF_Guide_4_2_upd2_Classic.md, cap. General Setup Programs, pp. 16–83 · versão de produção 6.2 pode conter campos adicionais",
+     nav:"Abas do MRFP"},
+ es:{title:"RF Profile — Navegador de Campos",
+     intro:"Todos los campos del perfil de RF, pestaña por pestaña: qué hace cada uno, qué valores acepta y en qué programas RF actúa. MRFP define los valores por defecto y las opciones disponibles en los programas RF principales y, una vez creado, debe vincularse al o a los clientes en CUST.",
+     src:"Fuente: H_RF_Guide_4_2_upd2_Classic.md · cap. GENERAL SETUP PROGRAMS · pp. 16–83",
+     mapH:"Mapa de impacto",
+     mapP:"Cada programa RF de abajo es tocado por N campos de MRFP. Haga clic para filtrar solo los campos que afectan a ese programa.",
+     ph:"Buscar campo, valor o comportamiento…",
+     hide:"Ocultar campos reservados/personalizados", clear:"Limpiar filtros",
+     one:" campo", many:" campos",
+     res:"Reservado para uso futuro", cust:"Personalizado / hardware específico",
+     tab:"pestaña ", results:"Resultados",
+     resSub:"Campos de las 17 pestañas de MRFP que cumplen el filtro. Cada tarjeta indica su pestaña de origen.",
+     search:"búsqueda", program:"programa",
+     empty:"Ningún campo coincide con ese filtro. Pruebe otro término o limpie los filtros.",
+     foot:c=>"MRFP · "+c+" campos mapeados en 17 pestañas · H_RF_Guide_4_2_upd2_Classic.md, cap. General Setup Programs, pp. 16–83 · la versión de producción 6.2 puede tener campos adicionales",
+     nav:"Pestañas de MRFP"}
+};
+const L=()=>UI[lang];
+
+/* ---------- translated accessors ---------- */
+const tr=f=>lang==="es"?(T[f.t+"|"+f.n]||null):null;
+const fPt=f=>{const x=tr(f);return x&&x.s?x.s:f.pt};
+const fD =f=>{const x=tr(f);return x&&x.d?x.d:(x&&lang==="es"&&!x.d?"":f.d)};
+const fO =f=>{const x=tr(f);
+  if(!x||!x.o) return f.o||[];
+  return (f.o||[]).map((pair,i)=>[pair[0], x.o[i]!==undefined?x.o[i]:pair[1]]);};
+const tabG=t=>lang==="es"&&TABS_ES[t.id]?TABS_ES[t.id][0]:t.g;
+const tabS=t=>lang==="es"&&TABS_ES[t.id]?TABS_ES[t.id][1]:t.sum;
+
+/* ---------- program impact map ---------- */
+const tally={};
+F.forEach(f=>(f.p||[]).forEach(p=>tally[p]=(tally[p]||0)+1));
+const RF=Object.keys(tally).filter(p=>/^RF|^REPI$|^OLOP$/.test(p)).sort((a,b)=>tally[b]-tally[a]);
+progsEl.innerHTML=RF.map(p=>`<button class="prog" data-p="${p}" aria-pressed="false">${p}<b>${tally[p]}</b></button>`).join("");
+progsEl.addEventListener("click",e=>{
+  const b=e.target.closest(".prog"); if(!b)return;
+  prog = prog===b.dataset.p ? null : b.dataset.p;
+  [...progsEl.children].forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.p===prog)));
+  render();
+});
+
+/* ---------- rail ---------- */
+function buildRail(){
+  let lastG="";
+  railEl.setAttribute("aria-label",L().nav);
+  railEl.innerHTML=TABS.map(t=>{
+    const n=F.filter(f=>f.t===t.id).length, g=tabG(t);
+    const head = g!==lastG ? `<div class="grp">${(lastG=g)}</div>` : "";
+    return head+`<button class="tab" data-t="${t.id}"><span>${t.label}</span><span class="n">${n}</span></button>`;
+  }).join("");
+}
+railEl.addEventListener("click",e=>{
+  const b=e.target.closest(".tab"); if(!b)return;
+  active=b.dataset.t; qEl.value=""; render(); window.scrollTo({top:0});
+});
+
+/* ---------- language ---------- */
+langEl.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b||b.dataset.l===lang)return;
+  lang=b.dataset.l;
+  [...langEl.children].forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.l===lang)));
+  document.documentElement.lang=lang;
+  applyChrome(); buildRail(); render();
+});
+function applyChrome(){
+  const u=L();
+  document.getElementById("tTitle").textContent=u.title;
+  document.getElementById("tIntro").textContent=u.intro;
+  document.getElementById("tSrc").textContent=u.src;
+  document.getElementById("tMapH").textContent=u.mapH;
+  document.getElementById("tMapP").textContent=u.mapP;
+  document.getElementById("tHide").textContent=u.hide;
+  qEl.placeholder=u.ph; clrEl.textContent=u.clear;
+}
+
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function hl(html,term){
+  if(!term)return html;
+  const rx=new RegExp("("+term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","ig");
+  return html.replace(/>([^<]+)</g,(m,txt)=>">"+txt.replace(rx,"<mark>$1</mark>")+"<");
+}
+function card(f,term,showTab){
+  const u=L(), tab=TABS.find(t=>t.id===f.t);
+  const chips=[...(f.p||[]).map(p=>`<span class="chip">${p}</span>`)];
+  if(f.res)chips.push(`<span class="chip res">${u.res}</span>`);
+  if(f.cust)chips.push(`<span class="chip cust">${u.cust}</span>`);
+  if(showTab)chips.push(`<span class="chip" style="border-color:#C9D2E2;color:#5C6B7A">${u.tab}${tab.label}</span>`);
+  const rows=fO(f).map(([v,b])=>`<tr><td class="v">${esc(v)}</td><td>${b}</td></tr>`).join("");
+  const note=fD(f);
+  const html=`<article class="card">
+    <header>
+      <h3 class="fname">${esc(f.n)}</h3>
+      <p class="fpt">${fPt(f)}</p>
+      <div class="chips">${chips.join("")}</div>
+    </header>
+    ${rows?`<table><tbody>${rows}</tbody></table>`:""}
+    ${note?`<p class="note${f.res?" warn":""}">${note}</p>`:""}
+  </article>`;
+  return hl(html,term);
+}
+function render(){
+  const u=L(), term=qEl.value.trim(), searching=term.length>1;
+  let list=F;
+  if(prog) list=list.filter(f=>(f.p||[]).includes(prog));
+  if(hideResEl.checked) list=list.filter(f=>!f.res&&!f.cust);
+  if(searching){
+    const q=term.toLowerCase();
+    list=list.filter(f=>{
+      const hay=[f.n,f.pt,f.d||"",...(f.o||[]).flat(),fPt(f),fD(f)||"",...fO(f).map(r=>r[1])].join(" ").toLowerCase();
+      return hay.includes(q);
+    });
+  }else if(!prog){
+    list=list.filter(f=>f.t===active);
+  }
+  const filtered = searching||prog;   /* mostra o chip da aba em QUALQUER modo filtrado */
+  [...railEl.querySelectorAll(".tab")].forEach(b=>b.setAttribute("aria-current",String(!filtered&&b.dataset.t===active)));
+
+  let head;
+  if(filtered){
+    const bits=[searching?`${u.search} «${esc(term)}»`:null,prog?`${u.program} ${prog}`:null].filter(Boolean).join(" · ");
+    head=`<div class="tabhead"><h2>${u.results} <code>${bits}</code></h2><p>${u.resSub}</p></div>`;
+  }else{
+    const t=TABS.find(x=>x.id===active);
+    head=`<div class="tabhead"><h2>${t.label}<code>${t.code}</code></h2><p>${tabS(t)}</p></div>`;
+  }
+  cntEl.textContent=list.length+(list.length===1?u.one:u.many);
+  clrEl.hidden=!(searching||prog||hideResEl.checked);
+  mainEl.innerHTML=head+(list.length
+    ? list.map(f=>card(f,searching?term:"",filtered)).join("")
+    : `<div class="empty">${u.empty}</div>`)
+    +`<span class="srctag">${u.foot(F.length)}</span>`;
+}
+let deb;
+qEl.addEventListener("input",()=>{clearTimeout(deb);deb=setTimeout(render,140)});
+hideResEl.addEventListener("change",render);
+clrEl.addEventListener("click",()=>{qEl.value="";hideResEl.checked=false;prog=null;
+  [...progsEl.children].forEach(x=>x.setAttribute("aria-pressed","false"));render();window.scrollTo({top:0})});
+applyChrome(); buildRail(); render();
+</script>
